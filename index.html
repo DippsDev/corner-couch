@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>CornerCouch — Open Bar Club</title>
+    <meta
+      name="description"
+      content="CornerCouch demo site — replace placeholder photos and copy with the venue’s own."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+      window.scrollTo(0, 0);
+    </script>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div class="loader" id="loader" aria-hidden="true">
+      <div class="loader__bg"></div>
+      <div class="loader__mark">
+        <span class="loader__word">Corner</span>
+        <span class="loader__word">Couch</span>
+      </div>
+    </div>
+
+    <header class="nav" id="nav">
+      <button class="nav__menu" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+      </button>
+      <a class="nav__logo" href="#top" aria-label="CornerCouch home">
+        <span>Corner</span><span>Couch</span>
+      </a>
+      <button class="nav__book" data-open-book>Book now</button>
+    </header>
+
+    <nav class="overlay" id="menu" aria-hidden="true">
+      <div class="overlay__inner">
+        <p class="kicker">Menu</p>
+        <ul>
+          <li><a href="#top">Link one</a></li>
+          <li><a href="#packages">Link two</a></li>
+          <li><a href="#drinks">Link three</a></li>
+          <li><a href="#events">Link four</a></li>
+          <li><a href="#book">Link five</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main id="top">
+      <div class="stack">
+        <section class="hero" aria-label="Hero">
+          <div class="hero__media" data-hero-media></div>
+          <div class="hero__veil"></div>
+          <div class="hero__content">
+            <p class="kicker">Venue type</p>
+            <h1>Headline<br />goes here.</h1>
+          </div>
+          <a class="scroll-hint" href="#night">
+            <span>Scroll down</span>
+            <em></em>
+          </a>
+        </section>
+
+        <section class="scene scene--light" id="night" style="--img: url('/images/placeholder-room.svg')">
+          <div class="scene__media"></div>
+          <div class="scene__copy">
+            <p class="kicker">Section</p>
+            <h2>Headline<br />goes here.</h2>
+          </div>
+        </section>
+
+        <section class="scene scene--dark" id="room" style="--img: url('/images/placeholder-section.svg')">
+          <div class="scene__media"></div>
+          <div class="scene__copy">
+            <p class="kicker">Section</p>
+            <h2>Headline<br />goes here.</h2>
+          </div>
+        </section>
+      </div>
+
+      <section class="packages" id="packages">
+        <div class="packages__head">
+          <p class="kicker">Packages</p>
+          <h2>Offer title.</h2>
+        </div>
+        <div class="packages__grid">
+          <button class="pack" type="button" data-open-book data-pack="open-bar">
+            <span class="pack__tag">Label</span>
+            <h3>Package one</h3>
+            <span class="pack__meta">From 00€</span>
+          </button>
+          <button class="pack" type="button" data-open-book data-pack="vip-couch">
+            <span class="pack__tag">Label</span>
+            <h3>Package two</h3>
+            <span class="pack__meta">From 00€</span>
+          </button>
+          <button class="pack" type="button" data-open-book data-pack="birthday">
+            <span class="pack__tag">Label</span>
+            <h3>Package three</h3>
+            <span class="pack__meta">From 00€</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="events" id="events">
+        <div class="events__head">
+          <p class="kicker">Events</p>
+          <h2>Event list.</h2>
+        </div>
+        <ul class="events__list">
+          <li>
+            <button type="button" data-open-book data-date="2026-08-21" data-pack="open-bar">
+              <span class="events__date">Fri 00.00</span>
+              <span class="events__name">Event title</span>
+              <span class="events__cta">Book</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" data-open-book data-date="2026-08-22" data-pack="vip-couch">
+              <span class="events__date">Sat 00.00</span>
+              <span class="events__name">Event title</span>
+              <span class="events__cta">Book</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" data-open-book data-date="2026-08-23" data-pack="open-bar">
+              <span class="events__date">Sun 00.00</span>
+              <span class="events__name">Event title</span>
+              <span class="events__cta">Book</span>
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      <section class="drinks" id="drinks">
+        <div class="drinks__list">
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Signature cocktails
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Silent 0%</p>
+                  <p class="drink-row__note">Ingredient, ingredient, and soda</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Light</p>
+                  <p class="drink-row__note">Spirit, vermouth, bitter, and soda</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Dark</p>
+                  <p class="drink-row__note">Spirit, vermouth, bitter, and reduction</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Silent 0%</p>
+                  <p class="drink-row__note">Juice, cordial, and tonic</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Light</p>
+                  <p class="drink-row__note">Spirit, cordial, citrus, and soda</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Mild</p>
+                  <p class="drink-row__note">Spirit, liqueur, citrus, and spice</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Drink title Dark</p>
+                  <p class="drink-row__note">Aged spirit, amaro, and coconut water</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Aperitivi
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">House pours</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Spritz one</p>
+                  <p class="drink-row__note">Prosecco, soda, bitter, citrus</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Spritz two</p>
+                  <p class="drink-row__note">Prosecco, soda, bitter, citrus</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">House aperitivo</p>
+                  <p class="drink-row__note">Aperitivo, tonic, lemon</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Classics</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Classic one</p>
+                  <p class="drink-row__note">Spirit, vermouth, and bitter</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Classic two</p>
+                  <p class="drink-row__note">Spirit, coffee, and sugar</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Classic three</p>
+                  <p class="drink-row__note">Spirit, sugar, and bitters</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Gin, vodka &amp; tequila
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">Gin</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Vodka</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Tequila</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drinks__aside">Turn a pour into a long drink or a classic +00€. Service is 30ml.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Rum, whisky &amp; liqueurs
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">Rum</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Whisky</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Liqueurs</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Bottle name</p>
+                  <p class="drink-row__note">Origin</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Wine list
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">Sparkling</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Producer name</p>
+                  <p class="drink-row__note">Wine title — Region, grape</p>
+                  <p class="drink-row__price">12cl 00€ · 75cl 00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Producer name</p>
+                  <p class="drink-row__note">Wine title — Region, grape</p>
+                  <p class="drink-row__price">12cl 00€ · 75cl 00€</p>
+                </div>
+                <p class="drink-group">White / red / rosé</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Producer name</p>
+                  <p class="drink-row__note">White — Region, grape</p>
+                  <p class="drink-row__price">12cl 00€ · 75cl 00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Producer name</p>
+                  <p class="drink-row__note">Red — Region, grape</p>
+                  <p class="drink-row__price">12cl 00€ · 75cl 00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Producer name</p>
+                  <p class="drink-row__note">Rosé — Region, grape</p>
+                  <p class="drink-row__price">12cl 00€ · 75cl 00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Beer
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <div class="drink-row">
+                  <p class="drink-row__name">Beer title</p>
+                  <p class="drink-row__note">Lager — Origin, 0.0%</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Beer title</p>
+                  <p class="drink-row__note">IPA — Origin, 0.0%</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Beer title 0%</p>
+                  <p class="drink-row__note">Alcohol free — Origin, 0%</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Soft drinks
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">Mixers</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Soft drink</p>
+                  <p class="drink-row__note">Mixer</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Soft drink</p>
+                  <p class="drink-row__note">Mixer</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Soft drink</p>
+                  <p class="drink-row__note">Mixer</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">Water</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Still water</p>
+                  <p class="drink-row__note">25cl / 75cl</p>
+                  <p class="drink-row__price">00€ · 00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Sparkling water</p>
+                  <p class="drink-row__note">25cl / 75cl</p>
+                  <p class="drink-row__price">00€ · 00€</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="drinks__acc">
+            <button class="drinks__toggle" type="button" aria-expanded="false">
+              Food
+            </button>
+            <div class="drinks__panel">
+              <div class="drinks__panel-inner">
+                <p class="drink-group">From 16:00 to midnight</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drink-group">From 18:00 to 22:00</p>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <div class="drink-row">
+                  <p class="drink-row__name">Plate title</p>
+                  <p class="drink-row__note">Short description of the dish</p>
+                  <p class="drink-row__price">00€</p>
+                </div>
+                <p class="drinks__aside">Allergen and dietary notes go here.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot" id="book">
+      <div class="foot__grid">
+        <div>
+          <p class="kicker">Reservations</p>
+          <button class="text-link" data-open-book>Book your couch</button>
+        </div>
+        <div>
+          <p class="kicker">Info</p>
+          <p>Street address<br />City, Country</p>
+          <a href="tel:+00000000000">+00 00 0000 0000</a>
+        </div>
+        <div>
+          <p class="kicker">Opening hours</p>
+          <p>Day — Day<br />00:00 — 00:00</p>
+        </div>
+        <div>
+          <p class="kicker">Follow us</p>
+          <p>@handle</p>
+        </div>
+      </div>
+      <p class="foot__legal">Demo for CornerCouch — replace photos and copy</p>
+    </footer>
+
+    <aside class="book" id="bookPanel" aria-hidden="true">
+      <button class="book__close" id="bookClose" aria-label="Close booking">Close</button>
+      <div class="book__scroll" data-lenis-prevent>
+      <div class="book__inner">
+        <p class="kicker">Reservations</p>
+        <h2>Book your couch</h2>
+        <form id="bookForm" novalidate>
+          <div class="datepicker">
+            <span>Date</span>
+            <input type="hidden" name="date" required />
+            <button
+              class="datepicker__trigger"
+              type="button"
+              id="dateTrigger"
+              aria-haspopup="dialog"
+              aria-expanded="false"
+            >
+              <span data-date-label>dd / mm / yyyy</span>
+            </button>
+            <div class="datepicker__pop" id="datePop" role="dialog" aria-label="Choose a date">
+              <div class="datepicker__body">
+                <div class="datepicker__nav">
+                  <button type="button" data-cal-prev aria-label="Previous month">‹</button>
+                  <p data-cal-month></p>
+                  <button type="button" data-cal-next aria-label="Next month">›</button>
+                </div>
+                <div class="datepicker__week" aria-hidden="true">
+                  <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+                <div class="datepicker__grid" data-cal-grid></div>
+              </div>
+            </div>
+          </div>
+          <label>
+            <span>Arrival</span>
+            <select name="time" required>
+              <option value="22:00">22:00</option>
+              <option value="23:00">23:00</option>
+              <option value="00:00">00:00</option>
+            </select>
+          </label>
+          <label>
+            <span>Guests</span>
+            <select name="guests" required>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6" selected>6</option>
+              <option value="8">8</option>
+              <option value="10">10</option>
+              <option value="12">12</option>
+              <option value="16">16+</option>
+            </select>
+          </label>
+          <label>
+            <span>Night</span>
+            <select name="pack" required>
+              <option value="open-bar">Package one</option>
+              <option value="vip-couch">Package two</option>
+              <option value="birthday">Package three</option>
+            </select>
+          </label>
+          <label>
+            <span>Name</span>
+            <input type="text" name="name" autocomplete="name" placeholder="Full name" required />
+          </label>
+          <label>
+            <span>Phone or WhatsApp</span>
+            <input type="tel" name="contact" autocomplete="tel" placeholder="+00 00 0000 0000" required />
+          </label>
+          <button type="submit">Request the table</button>
+        </form>
+        <div class="book__done" id="bookDone" hidden>
+          <h3>Held for you.</h3>
+          <p id="bookSummary"></p>
+          <button type="button" data-close-done>Back to the night</button>
+        </div>
+      </div>
+      </div>
+    </aside>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
