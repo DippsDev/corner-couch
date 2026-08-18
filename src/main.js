@@ -13,6 +13,14 @@ const bookPanel = document.querySelector("#bookPanel");
 const bookForm = document.querySelector("#bookForm");
 const bookDone = document.querySelector("#bookDone");
 const bookSummary = document.querySelector("#bookSummary");
+const bookSeat = document.querySelector("#bookSeat");
+const bookKicker = document.querySelector("#bookKicker");
+const bookTitle = document.querySelector("#bookTitle");
+const paySeat = document.querySelector("#paySeat");
+const seatChoice = document.querySelector("#seatChoice");
+const seatButtons = [...document.querySelectorAll(".seat")];
+let pendingBooking = null;
+let selectedSeat = "";
 const loader = document.querySelector("#loader");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const packNames = {
@@ -166,6 +174,11 @@ function lock(on) {
 const nav = document.querySelector("#nav");
 let menuOpen = false;
 let menuTween;
+
+lenis.on("scroll", ({ scroll }) => {
+  if (!nav) return;
+  nav.style.setProperty("--nav-line", String(1 - Math.min(1, scroll / 160)));
+});
 
 function openMenu() {
   if (menuOpen) return;
@@ -390,13 +403,43 @@ document.addEventListener("pointerdown", (event) => {
   closeDatepicker();
 });
 
+function resetSeatStep() {
+  selectedSeat = "";
+  pendingBooking = null;
+  seatButtons.forEach((btn) => {
+    btn.classList.remove("is-on");
+    btn.setAttribute("aria-checked", "false");
+  });
+  if (seatChoice) seatChoice.textContent = "No section selected";
+  if (paySeat) paySeat.disabled = true;
+}
+
+function showBookStep(step) {
+  const isForm = step === "form";
+  const isSeat = step === "seat";
+  const isDone = step === "done";
+  bookForm.hidden = !isForm;
+  if (bookSeat) bookSeat.hidden = !isSeat;
+  bookDone.hidden = !isDone;
+  if (bookKicker) bookKicker.hidden = isDone;
+  if (bookTitle) bookTitle.hidden = isDone;
+  if (bookKicker) {
+    bookKicker.textContent = isSeat ? "Secure the table" : "Reservations";
+  }
+  if (bookTitle) {
+    bookTitle.textContent = isSeat ? "Choose your seat." : "Book your couch";
+  }
+  const scroll = bookPanel.querySelector(".book__scroll");
+  if (scroll) scroll.scrollTop = 0;
+}
+
 let bookOpen = false;
 let bookTween;
 
 function openBook({ date, pack } = {}, trigger) {
   closeMenu({ immediate: true });
-  bookForm.hidden = false;
-  bookDone.hidden = true;
+  resetSeatStep();
+  showBookStep("form");
   if (date) setPickedDate(date);
   if (pack) bookForm.pack.value = pack;
 
@@ -558,23 +601,73 @@ bookForm.addEventListener("submit", (event) => {
     return;
   }
 
+  pendingBooking = data;
+  showBookStep("seat");
+});
+
+seatButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    selectedSeat = btn.dataset.seat || "";
+    seatButtons.forEach((other) => {
+      const on = other === btn;
+      other.classList.toggle("is-on", on);
+      other.setAttribute("aria-checked", on ? "true" : "false");
+    });
+    if (seatChoice) seatChoice.textContent = `${selectedSeat} selected`;
+    if (paySeat) paySeat.disabled = false;
+  });
+});
+
+paySeat?.addEventListener("click", () => {
+  if (!pendingBooking || !selectedSeat) return;
+  const data = { ...pendingBooking, seat: selectedSeat, fee: 1500 };
   const bookings = JSON.parse(localStorage.getItem("cornercouch-bookings") || "[]");
   bookings.push({ ...data, createdAt: new Date().toISOString() });
   localStorage.setItem("cornercouch-bookings", JSON.stringify(bookings));
 
-  bookSummary.textContent = `${data.name}, ${packNames[data.pack] || data.pack} for ${data.guests} on ${data.date} at ${data.time}. We’ll message ${data.contact}.`;
-  bookForm.hidden = true;
-  bookDone.hidden = false;
+  bookSummary.textContent = `${data.name}, ${packNames[data.pack] || data.pack} for ${data.guests} on ${data.date} at ${data.time}. ${data.seat} held for 1500P. We’ll message ${data.contact}.`;
+  showBookStep("done");
+});
+
+document.querySelector("[data-seat-back]")?.addEventListener("click", () => {
+  showBookStep("form");
 });
 
 const drinkAccordions = [...document.querySelectorAll(".drinks__acc")];
-const drinkEase = "power3.inOut";
-const drinkDur = 0.62;
+const drinkEase = "power2.out";
+const drinkDur = 0.85;
+let drinkFollow;
+
+function stopDrinkFollow() {
+  if (!drinkFollow) return;
+  gsap.ticker.remove(drinkFollow);
+  drinkFollow = null;
+}
+
+function glideToggleIntoView(toggle) {
+  stopDrinkFollow();
+  const navH = document.querySelector(".nav")?.offsetHeight ?? 80;
+  const offset = navH + 28;
+  let frames = 0;
+
+  drinkFollow = () => {
+    const desired = lenis.scroll + toggle.getBoundingClientRect().top - offset;
+    const distance = desired - lenis.scroll;
+    if (Math.abs(distance) < 0.6 || frames++ > 96) {
+      stopDrinkFollow();
+      return;
+    }
+    lenis.scrollTo(lenis.scroll + distance * 0.055, { immediate: true });
+  };
+
+  gsap.ticker.add(drinkFollow);
+}
 
 function closeDrink(acc) {
   const toggle = acc.querySelector(".drinks__toggle");
   const panel = acc.querySelector(".drinks__panel");
   if (!acc.classList.contains("is-open")) return;
+  stopDrinkFollow();
   acc.classList.remove("is-open");
   toggle?.setAttribute("aria-expanded", "false");
   if (reduceMotion) {
@@ -594,6 +687,8 @@ function openDrink(acc) {
   toggle?.setAttribute("aria-expanded", "true");
   if (reduceMotion) {
     gsap.set(panel, { height: "auto" });
+    const navH = document.querySelector(".nav")?.offsetHeight ?? 80;
+    lenis.scrollTo(toggle, { offset: -(navH + 28), immediate: true });
     return;
   }
   gsap.fromTo(
@@ -604,12 +699,9 @@ function openDrink(acc) {
       duration: drinkDur,
       ease: drinkEase,
       overwrite: true,
-      onComplete: () => {
-        const navH = document.querySelector(".nav")?.offsetHeight ?? 80;
-        lenis.scrollTo(toggle, { offset: -(navH + 12), duration: 0.7 });
-      },
     },
   );
+  glideToggleIntoView(toggle);
 }
 
 drinkAccordions.forEach((acc) => {

@@ -137,6 +137,22 @@ p {
   opacity: 0;
 }
 
+.nav::after {
+  content: "";
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 0;
+  height: 1px;
+  background: rgba(248, 239, 193, 0.28);
+  opacity: var(--nav-line, 1);
+  pointer-events: none;
+}
+
+.nav.is-open::after {
+  opacity: 0;
+}
+
 .nav.is-open {
   z-index: 70;
   background: none;
@@ -787,19 +803,21 @@ body.is-ready .scroll-hint {
 }
 
 .book__inner {
-  width: min(560px, calc(100% - (var(--gutter) * 2)));
+  width: min(600px, calc(100% - (var(--gutter) * 2)));
   margin: max(5.5rem, calc(12vh + var(--safe-top))) auto 0;
   padding-bottom: calc(4.5rem + var(--safe-bottom));
 }
 
-.book form,
+.book form:not([hidden]),
+.book__seat:not([hidden]),
 .book__done:not([hidden]) {
   display: grid;
   gap: 1.1rem;
   margin-top: 2rem;
 }
 
-.book__done[hidden] {
+.book__done[hidden],
+.book__seat[hidden] {
   display: none;
 }
 
@@ -994,6 +1012,7 @@ body.is-ready .scroll-hint {
 }
 
 .book form > button,
+.book__pay,
 .book__done button {
   position: relative;
   z-index: 0;
@@ -1006,10 +1025,16 @@ body.is-ready .scroll-hint {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   min-height: 3.15rem;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.book__pay:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .book form > button::before,
+.book__pay::before,
 .book__done button::before {
   content: "";
   position: absolute;
@@ -1022,17 +1047,152 @@ body.is-ready .scroll-hint {
 }
 
 .book form > button:focus-visible::before,
+.book__pay:focus-visible:not(:disabled)::before,
 .book__done button:focus-visible::before {
   transform: scaleX(1);
 }
 
 .book form > button:active,
+.book__pay:active:not(:disabled),
 .book__done button:active {
   transform: scale(0.985);
 }
 
 .book__done h3 {
   font-size: clamp(2.4rem, 6vw, 4rem);
+}
+
+.book__lead {
+  margin: 0;
+  max-width: 28rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+.seat-map-wrap {
+  overflow: hidden;
+  border: 1px solid rgba(20, 12, 8, 0.12);
+}
+
+.floorplan {
+  position: relative;
+  width: 100%;
+  color: var(--ink);
+}
+
+.floorplan__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  pointer-events: none;
+}
+
+.floorplan__room {
+  fill: none;
+  stroke: rgba(20, 12, 8, 0.22);
+  stroke-width: 1.2;
+}
+
+.floorplan__marks {
+  fill: none;
+  stroke: rgba(20, 12, 8, 0.28);
+  stroke-width: 1.2;
+}
+
+.floorplan__zones rect {
+  fill: rgba(20, 12, 8, 0.04);
+  stroke: rgba(20, 12, 8, 0.38);
+  stroke-width: 1.2;
+}
+
+.floorplan__labels text {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: currentColor;
+  stroke: none;
+}
+
+.floorplan__labels .floorplan__quiet {
+  fill: rgba(20, 12, 8, 0.42);
+}
+
+.seat {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.seat.is-on,
+.seat:focus-visible {
+  background: rgba(208, 79, 24, 0.2);
+}
+
+.seat--out {
+  left: 71%;
+  top: 8%;
+  width: 20%;
+  height: 11%;
+}
+
+.seat--a {
+  left: 33%;
+  top: 8%;
+  width: 35%;
+  height: 11%;
+}
+
+.seat--b {
+  left: 8%;
+  top: 22%;
+  width: 21%;
+  height: 38%;
+}
+
+.seat--c {
+  left: 8%;
+  top: 63%;
+  width: 21%;
+  height: 28%;
+}
+
+.seat--vip {
+  left: 33%;
+  top: 47%;
+  width: 58%;
+  height: 44%;
+}
+
+.book__choice {
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: var(--terracotta);
+}
+
+.book__pay {
+  margin-top: 0.15rem;
+}
+
+.book__back {
+  justify-self: start;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  opacity: 0.55;
+  min-height: 2.5rem;
+}
+
+.book__back:focus-visible {
+  opacity: 1;
+  color: var(--terracotta);
 }
 
 .is-locked {
@@ -1081,8 +1241,18 @@ body.is-ready .scroll-hint {
   }
 
   .book form > button:hover::before,
+  .book__pay:hover:not(:disabled)::before,
   .book__done button:hover::before {
     transform: scaleX(1);
+  }
+
+  .book__back:hover {
+    opacity: 1;
+    color: var(--terracotta);
+  }
+
+  .seat:hover {
+    background: rgba(208, 79, 24, 0.1);
   }
 
   .drinks__toggle:hover {
@@ -1108,16 +1278,34 @@ body.is-ready .scroll-hint {
   }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 639px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 1fr;
+    align-items: end;
+    column-gap: 0.85rem;
+  }
+
+  .hero__content {
+    padding-bottom: 0.15rem;
+  }
+
   .scroll-hint {
-    letter-spacing: 0.16em;
-    font-size: 0.62rem;
+    margin: 0 2.35rem 0 0;
+    padding-bottom: 0.2rem;
+    gap: 0;
+  }
+
+  .scroll-hint span {
+    display: none;
   }
 
   .scroll-hint em {
-    height: 28px;
+    height: 2.75rem;
   }
+}
 
+@media (max-width: 479px) {
   .events__list button {
     padding: 1.25rem 0;
   }

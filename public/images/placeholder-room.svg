@@ -1,6 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
   <rect width="1920" height="1080" fill="#f8efc1"/>
-  <rect x="80" y="80" width="1760" height="920" fill="none" stroke="#d04f18" stroke-opacity="0.45" stroke-width="1"/>
-  <text x="960" y="500" text-anchor="middle" fill="#140c08" font-family="Times New Roman, serif" font-size="56">Placeholder photo</text>
-  <text x="960" y="556" text-anchor="middle" fill="#d04f18" font-family="Arial, sans-serif" font-size="16" letter-spacing="8">02 — SECTION</text>
 </svg>
