@@ -636,38 +636,11 @@ document.querySelector("[data-seat-back]")?.addEventListener("click", () => {
 const drinkAccordions = [...document.querySelectorAll(".drinks__acc")];
 const drinkEase = "power2.out";
 const drinkDur = 0.85;
-let drinkFollow;
-
-function stopDrinkFollow() {
-  if (!drinkFollow) return;
-  gsap.ticker.remove(drinkFollow);
-  drinkFollow = null;
-}
-
-function glideToggleIntoView(toggle) {
-  stopDrinkFollow();
-  const navH = document.querySelector(".nav")?.offsetHeight ?? 80;
-  const offset = navH + 28;
-  let frames = 0;
-
-  drinkFollow = () => {
-    const desired = lenis.scroll + toggle.getBoundingClientRect().top - offset;
-    const distance = desired - lenis.scroll;
-    if (Math.abs(distance) < 0.6 || frames++ > 96) {
-      stopDrinkFollow();
-      return;
-    }
-    lenis.scrollTo(lenis.scroll + distance * 0.055, { immediate: true });
-  };
-
-  gsap.ticker.add(drinkFollow);
-}
 
 function closeDrink(acc) {
   const toggle = acc.querySelector(".drinks__toggle");
   const panel = acc.querySelector(".drinks__panel");
   if (!acc.classList.contains("is-open")) return;
-  stopDrinkFollow();
   acc.classList.remove("is-open");
   toggle?.setAttribute("aria-expanded", "false");
   if (reduceMotion) {
@@ -687,8 +660,6 @@ function openDrink(acc) {
   toggle?.setAttribute("aria-expanded", "true");
   if (reduceMotion) {
     gsap.set(panel, { height: "auto" });
-    const navH = document.querySelector(".nav")?.offsetHeight ?? 80;
-    lenis.scrollTo(toggle, { offset: -(navH + 28), immediate: true });
     return;
   }
   gsap.fromTo(
@@ -701,7 +672,6 @@ function openDrink(acc) {
       overwrite: true,
     },
   );
-  glideToggleIntoView(toggle);
 }
 
 drinkAccordions.forEach((acc) => {
