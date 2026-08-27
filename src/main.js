@@ -78,6 +78,18 @@ function playIntro() {
       "-=0.35",
     )
     .fromTo(
+      ".nav__menu-icon span",
+      { width: 0 },
+      {
+        width: "100%",
+        duration: 0.45,
+        stagger: 0.1,
+        ease: "power3.out",
+        onComplete: cueMenu,
+      },
+      "-=0.28",
+    )
+    .fromTo(
       ".hero__content",
       { y: 18, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
@@ -180,10 +192,22 @@ lenis.on("scroll", ({ scroll }) => {
   nav.style.setProperty("--nav-line", String(1 - Math.min(1, scroll / 160)));
 });
 
+function setMenuChrome(open) {
+  menuBtn?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+}
+
+function cueMenu() {
+  if (!menuBtn || reduceMotion || menuOpen) return;
+  menuBtn.classList.add("is-hinting");
+  window.setTimeout(() => menuBtn.classList.remove("is-hinting"), 4800);
+}
+
 function openMenu() {
   if (menuOpen) return;
   menuOpen = true;
+  menuBtn.classList.remove("is-hinting");
   menuBtn.setAttribute("aria-expanded", "true");
+  setMenuChrome(true);
   menu.setAttribute("aria-hidden", "false");
   nav.classList.add("is-open");
   menu.classList.add("is-open");
@@ -236,6 +260,7 @@ function closeMenu({ immediate = false } = {}) {
 
   menuOpen = false;
   menuBtn.setAttribute("aria-expanded", "false");
+  setMenuChrome(false);
   nav.classList.remove("is-open");
   menu.classList.remove("is-open");
   menuTween?.kill();

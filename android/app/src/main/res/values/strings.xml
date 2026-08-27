@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CornerCouch</string>
+    <string name="title_activity_main">CornerCouch</string>
+    <string name="package_name">com.cornercouch.app</string>
+    <string name="custom_url_scheme">com.cornercouch.app</string>
+</resources>

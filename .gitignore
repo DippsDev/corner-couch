@@ -1,3 +1,13 @@
 node_modules
 dist
 .DS_Store
+
+# Native build output (keep the ios/ and android/ project folders)
+android/.gradle
+android/app/build
+android/build
+android/local.properties
+android/app/release
+ios/App/Pods
+ios/App/App/public
+*.iml

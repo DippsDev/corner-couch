@@ -169,37 +169,62 @@ p {
 }
 
 .nav__menu {
+  justify-self: start;
+  display: grid;
+  place-items: center;
   width: 44px;
   height: 44px;
-  justify-self: start;
-  position: relative;
+  padding: 0;
+  color: inherit;
 }
 
-.nav__menu span {
+.nav__menu-icon {
+  position: relative;
+  display: block;
+  width: 1.45rem;
+  height: 0.72rem;
+}
+
+.nav__menu-icon span {
   position: absolute;
   left: 0;
   top: 50%;
   display: block;
-  height: 1px;
-  width: 28px;
+  height: 1.5px;
+  width: 100%;
   background: currentColor;
+  transform-origin: center;
   transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-.nav__menu span:first-child {
-  transform: translateY(-5px);
+.nav__menu-icon span:first-child {
+  transform: translateY(-4px);
 }
 
-.nav__menu span:last-child {
-  transform: translateY(5px);
+.nav__menu-icon span:last-child {
+  transform: translateY(4px);
 }
 
-.nav.is-open .nav__menu span:first-child {
+.nav.is-open .nav__menu-icon span:first-child {
   transform: rotate(45deg);
 }
 
-.nav.is-open .nav__menu span:last-child {
+.nav.is-open .nav__menu-icon span:last-child {
   transform: rotate(-45deg);
+}
+
+.nav__menu.is-hinting {
+  animation: menu-cue 1.55s ease-in-out 3;
+}
+
+@keyframes menu-cue {
+  0%,
+  100% {
+    color: inherit;
+  }
+  40% {
+    color: var(--terracotta);
+  }
 }
 
 .nav__book {
@@ -1200,6 +1225,10 @@ body.is-ready .scroll-hint {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .nav__menu:hover {
+    color: var(--terracotta);
+  }
+
   .nav__book:hover {
     color: var(--terracotta);
     border-color: var(--cream);
@@ -1360,6 +1389,10 @@ body.is-ready .scroll-hint {
   .hero__content,
   .scroll-hint {
     opacity: 1;
+  }
+
+  .nav__menu.is-hinting {
+    animation: none;
   }
 
   .book form > button::before,

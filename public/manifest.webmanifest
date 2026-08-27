@@ -1,0 +1,24 @@
+{
+  "name": "CornerCouch",
+  "short_name": "CornerCouch",
+  "description": "CornerCouch demo — open bar club",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#140c08",
+  "theme_color": "#140c08",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

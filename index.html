@@ -8,7 +8,13 @@
       name="description"
       content="CornerCouch demo site — replace placeholder photos and copy with the venue’s own."
     />
+    <meta name="theme-color" content="#140c08" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CornerCouch" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -33,8 +39,10 @@
 
     <header class="nav" id="nav">
       <button class="nav__menu" id="menuBtn" aria-label="Open menu" aria-expanded="false">
-        <span></span>
-        <span></span>
+        <i class="nav__menu-icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </i>
       </button>
       <a class="nav__logo" href="#top" aria-label="CornerCouch home">
         <span>Corner</span><span>Couch</span>
@@ -46,11 +54,11 @@
       <div class="overlay__inner">
         <p class="kicker">Menu</p>
         <ul>
-          <li><a href="#top">Link one</a></li>
-          <li><a href="#packages">Link two</a></li>
-          <li><a href="#drinks">Link three</a></li>
-          <li><a href="#events">Link four</a></li>
-          <li><a href="#book">Link five</a></li>
+          <li><a href="#top">Home</a></li>
+          <li><a href="#packages">Packages</a></li>
+          <li><a href="#drinks">Food &amp; drinks</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#book">Visit</a></li>
         </ul>
       </div>
     </nav>
