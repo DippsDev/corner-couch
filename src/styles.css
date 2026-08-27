@@ -663,11 +663,19 @@ body.is-ready .scroll-hint {
 }
 
 .drinks__panel {
-  height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   overflow: hidden;
+  transition: grid-template-rows 0.72s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.drinks__acc.is-open .drinks__panel {
+  grid-template-rows: 1fr;
 }
 
 .drinks__panel-inner {
+  min-height: 0;
+  overflow: hidden;
   padding: 0.4rem 0 2.4rem;
 }
 

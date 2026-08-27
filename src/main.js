@@ -659,49 +659,72 @@ document.querySelector("[data-seat-back]")?.addEventListener("click", () => {
 });
 
 const drinkAccordions = [...document.querySelectorAll(".drinks__acc")];
-const drinkEase = "power2.out";
-const drinkDur = 0.85;
+const drinkDur = 0.72;
+const drinkEase = (t) => 1 - (1 - t) ** 3;
+
+function drinkNavOffset() {
+  return (nav?.getBoundingClientRect().height ?? 80) + 10;
+}
+
+function drinkTargetScroll(toggle) {
+  const current = lenis.animatedScroll;
+  const toggleTop = toggle.getBoundingClientRect().top;
+  let collapseAbove = 0;
+
+  drinkAccordions.forEach((other) => {
+    if (other.classList.contains("is-open") && other.querySelector(".drinks__toggle") !== toggle) {
+      const otherToggle = other.querySelector(".drinks__toggle");
+      const panel = other.querySelector(".drinks__panel-inner");
+      if (!otherToggle || !panel) return;
+      if (otherToggle.getBoundingClientRect().top < toggleTop) {
+        collapseAbove += panel.offsetHeight;
+      }
+    }
+  });
+
+  return Math.max(0, current + toggleTop - drinkNavOffset() - collapseAbove);
+}
 
 function closeDrink(acc) {
   const toggle = acc.querySelector(".drinks__toggle");
-  const panel = acc.querySelector(".drinks__panel");
   if (!acc.classList.contains("is-open")) return;
   acc.classList.remove("is-open");
   toggle?.setAttribute("aria-expanded", "false");
-  if (reduceMotion) {
-    gsap.set(panel, { height: 0 });
-    return;
-  }
-  gsap.to(panel, { height: 0, duration: drinkDur, ease: drinkEase, overwrite: true });
 }
 
 function openDrink(acc) {
   const toggle = acc.querySelector(".drinks__toggle");
-  const panel = acc.querySelector(".drinks__panel");
+  const targetScroll = toggle ? drinkTargetScroll(toggle) : lenis.animatedScroll;
+
   drinkAccordions.forEach((other) => {
     if (other !== acc) closeDrink(other);
   });
+
   acc.classList.add("is-open");
   toggle?.setAttribute("aria-expanded", "true");
+
+  if (!toggle) return;
+
   if (reduceMotion) {
-    gsap.set(panel, { height: "auto" });
+    lenis.scrollTo(targetScroll, { immediate: true });
     return;
   }
-  gsap.fromTo(
-    panel,
-    { height: 0 },
-    {
-      height: "auto",
-      duration: drinkDur,
-      ease: drinkEase,
-      overwrite: true,
-    },
-  );
+
+  if (Math.abs(targetScroll - lenis.animatedScroll) < 2) return;
+
+  lenis.scrollTo(targetScroll, {
+    duration: drinkDur,
+    easing: drinkEase,
+    programmatic: true,
+  });
 }
 
 drinkAccordions.forEach((acc) => {
   const toggle = acc.querySelector(".drinks__toggle");
-  gsap.set(acc.querySelector(".drinks__panel"), { height: 0 });
+  const panel = acc.querySelector(".drinks__panel");
+  const inner = panel?.querySelector(".drinks__panel-inner");
+  gsap.killTweensOf([panel, inner]);
+  gsap.set([panel, inner].filter(Boolean), { clearProps: "height,overflow,transform,opacity" });
   toggle?.addEventListener("click", () => {
     if (acc.classList.contains("is-open")) closeDrink(acc);
     else openDrink(acc);
