@@ -676,7 +676,18 @@ body.is-ready .scroll-hint {
 .drinks__panel-inner {
   min-height: 0;
   overflow: hidden;
-  padding: 0.4rem 0 2.4rem;
+}
+
+.drinks__panel-inner::before {
+  content: "";
+  display: block;
+  height: 0.4rem;
+}
+
+.drinks__panel-inner::after {
+  content: "";
+  display: block;
+  height: 2.4rem;
 }
 
 .drink-group {
