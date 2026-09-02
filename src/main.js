@@ -24,9 +24,9 @@ let selectedSeat = "";
 const loader = document.querySelector("#loader");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const packNames = {
-  "open-bar": "Package one",
-  "vip-couch": "Package two",
-  birthday: "Package three",
+  "open-bar": "Open bar",
+  "vip-couch": "The couch",
+  birthday: "The party",
 };
 
 const lenis = new Lenis({

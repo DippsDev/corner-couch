@@ -1,7 +1,7 @@
 {
   "name": "CornerCouch",
   "short_name": "CornerCouch",
-  "description": "CornerCouch demo — open bar club",
+  "description": "Open bar club in Phakalane, Gaborone. Book a couch and stay for the night.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
