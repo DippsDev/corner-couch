@@ -8,12 +8,14 @@
       name="description"
       content="CornerCouch demo site — replace placeholder photos and copy with the venue’s own."
     />
-    <meta name="theme-color" content="#140c08" />
+    <meta name="theme-color" content="#0a0a0a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="CornerCouch" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,13 +29,22 @@
       window.scrollTo(0, 0);
     </script>
     <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="preload" as="image" href="./src/assets/CORNER COUCH LOGO CC.png" fetchpriority="high" />
+    <link rel="preload" as="image" href="./src/assets/PHOTO-2026-09-01-11-21-44.jpg" fetchpriority="high" />
   </head>
   <body>
-    <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader" id="loader" role="status" aria-live="polite" aria-label="Loading Corner Couch">
       <div class="loader__bg"></div>
       <div class="loader__mark">
-        <span class="loader__word">Corner</span>
-        <span class="loader__word">Couch</span>
+        <img
+          class="loader__logo"
+          src="./src/assets/CORNER COUCH LOGO CC.png"
+          alt=""
+          width="3375"
+          height="3375"
+          decoding="sync"
+          fetchpriority="high"
+        />
       </div>
     </div>
 
@@ -66,11 +77,19 @@
     <main id="top">
       <div class="stack">
         <section class="hero" aria-label="Hero">
-          <div class="hero__media" data-hero-media></div>
+          <div class="hero__media" data-hero-media>
+            <img
+              src="./src/assets/PHOTO-2026-09-01-11-21-44.jpg"
+              alt=""
+              sizes="100vw"
+              decoding="async"
+              fetchpriority="high"
+            />
+          </div>
           <div class="hero__veil"></div>
           <div class="hero__content">
-            <p class="kicker">Venue type</p>
-            <h1>Headline<br />goes here.</h1>
+            <p class="kicker">Open bar club</p>
+            <h1>A corner.<br />A couch.<br />The night.</h1>
           </div>
           <a class="scroll-hint" href="#night" aria-label="Scroll down">
             <span>Scroll down</span>
@@ -78,19 +97,35 @@
           </a>
         </section>
 
-        <section class="scene scene--light" id="night" style="--img: url('/images/placeholder-room.svg')">
-          <div class="scene__media"></div>
+        <section class="scene scene--dark" id="night">
+          <div class="scene__media">
+            <img
+              src="./src/assets/PHOTO-2026-09-01-11-21-45 3.jpg"
+              alt=""
+              sizes="100vw"
+              decoding="async"
+              loading="lazy"
+            />
+          </div>
           <div class="scene__copy">
-            <p class="kicker">Section</p>
-            <h2>Headline<br />goes here.</h2>
+            <p class="kicker">The night</p>
+            <h2>Raise it.<br />Then sit.</h2>
           </div>
         </section>
 
-        <section class="scene scene--dark" id="room" style="--img: url('/images/placeholder-section.svg')">
-          <div class="scene__media"></div>
+        <section class="scene scene--dark" id="room">
+          <div class="scene__media">
+            <img
+              src="./src/assets/PHOTO-2026-09-01-11-21-46 2.jpg"
+              alt=""
+              sizes="100vw"
+              decoding="async"
+              loading="lazy"
+            />
+          </div>
           <div class="scene__copy">
-            <p class="kicker">Section</p>
-            <h2>Headline<br />goes here.</h2>
+            <p class="kicker">The room</p>
+            <h2>The booth<br />is open.</h2>
           </div>
         </section>
       </div>
@@ -515,11 +550,11 @@
         <p class="kicker" id="bookKicker">Reservations</p>
         <h2 id="bookTitle">Book your couch</h2>
         <form id="bookForm" novalidate>
-          <div class="datepicker">
+          <div class="book-drop datepicker">
             <span>Date</span>
             <input type="hidden" name="date" required />
             <button
-              class="datepicker__trigger"
+              class="book-drop__trigger"
               type="button"
               id="dateTrigger"
               aria-haspopup="dialog"
@@ -527,8 +562,8 @@
             >
               <span data-date-label>dd / mm / yyyy</span>
             </button>
-            <div class="datepicker__pop" id="datePop" role="dialog" aria-label="Choose a date">
-              <div class="datepicker__body">
+            <div class="book-drop__pop" id="datePop" role="dialog" aria-label="Choose a date">
+              <div class="book-drop__body">
                 <div class="datepicker__nav">
                   <button type="button" data-cal-prev aria-label="Previous month">‹</button>
                   <p data-cal-month></p>
@@ -541,34 +576,58 @@
               </div>
             </div>
           </div>
-          <label>
+          <div class="book-drop">
             <span>Arrival</span>
-            <select name="time" required>
-              <option value="22:00">22:00</option>
-              <option value="23:00">23:00</option>
-              <option value="00:00">00:00</option>
-            </select>
-          </label>
-          <label>
+            <input type="hidden" name="time" value="22:00" required />
+            <button class="book-drop__trigger is-filled" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span data-drop-label>22:00</span>
+            </button>
+            <div class="book-drop__pop" role="listbox" aria-label="Arrival">
+              <div class="book-drop__body">
+                <div class="book-drop__options">
+                  <button type="button" role="option" data-drop-option data-value="22:00" aria-selected="true" class="is-selected">22:00</button>
+                  <button type="button" role="option" data-drop-option data-value="23:00" aria-selected="false">23:00</button>
+                  <button type="button" role="option" data-drop-option data-value="00:00" aria-selected="false">00:00</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="book-drop">
             <span>Guests</span>
-            <select name="guests" required>
-              <option value="2">2</option>
-              <option value="4">4</option>
-              <option value="6" selected>6</option>
-              <option value="8">8</option>
-              <option value="10">10</option>
-              <option value="12">12</option>
-              <option value="16">16+</option>
-            </select>
-          </label>
-          <label>
+            <input type="hidden" name="guests" value="6" required />
+            <button class="book-drop__trigger is-filled" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span data-drop-label>6</span>
+            </button>
+            <div class="book-drop__pop" role="listbox" aria-label="Guests">
+              <div class="book-drop__body">
+                <div class="book-drop__options">
+                  <button type="button" role="option" data-drop-option data-value="2" aria-selected="false">2</button>
+                  <button type="button" role="option" data-drop-option data-value="4" aria-selected="false">4</button>
+                  <button type="button" role="option" data-drop-option data-value="6" aria-selected="true" class="is-selected">6</button>
+                  <button type="button" role="option" data-drop-option data-value="8" aria-selected="false">8</button>
+                  <button type="button" role="option" data-drop-option data-value="10" aria-selected="false">10</button>
+                  <button type="button" role="option" data-drop-option data-value="12" aria-selected="false">12</button>
+                  <button type="button" role="option" data-drop-option data-value="16" aria-selected="false">16+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="book-drop">
             <span>Night</span>
-            <select name="pack" required>
-              <option value="open-bar">Package one</option>
-              <option value="vip-couch">Package two</option>
-              <option value="birthday">Package three</option>
-            </select>
-          </label>
+            <input type="hidden" name="pack" value="open-bar" required />
+            <button class="book-drop__trigger is-filled" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span data-drop-label>Package one</span>
+            </button>
+            <div class="book-drop__pop" role="listbox" aria-label="Night">
+              <div class="book-drop__body">
+                <div class="book-drop__options">
+                  <button type="button" role="option" data-drop-option data-value="open-bar" aria-selected="true" class="is-selected">Package one</button>
+                  <button type="button" role="option" data-drop-option data-value="vip-couch" aria-selected="false">Package two</button>
+                  <button type="button" role="option" data-drop-option data-value="birthday" aria-selected="false">Package three</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <label>
             <span>Name</span>
             <input type="text" name="name" autocomplete="name" placeholder="Full name" required />

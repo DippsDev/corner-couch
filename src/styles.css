@@ -1,11 +1,14 @@
 :root {
-  --terracotta: #d04f18;
-  --terracotta-deep: #b33e10;
-  --cream: #f8efc1;
-  --cream-soft: #f3e7b0;
-  --ink: #140c08;
-  --ink-soft: #1c120c;
-  --white: #fffaf0;
+  --ink: #0a0a0a;
+  --ink-soft: #111111;
+  --ink-rgb: 10, 10, 10;
+  --cream: #f6f6f4;
+  --cream-soft: #ecece9;
+  --cream-rgb: 246, 246, 244;
+  --white: #ffffff;
+  --gold: #c9a45c;
+  --gold-deep: #8f6f2e;
+  --gold-rgb: 201, 164, 92;
   --serif: "Libre Caslon Text", "Times New Roman", serif;
   --sans: "Jost", "Futura", "Century Gothic", sans-serif;
   --gutter: clamp(1.15rem, 4.8vw, 4.5rem);
@@ -93,6 +96,14 @@ p {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   margin: 0;
+  color: var(--gold);
+}
+
+.scene--light .kicker,
+.packages .kicker,
+.drinks .kicker,
+.book .kicker {
+  color: var(--gold-deep);
 }
 
 .loader {
@@ -106,19 +117,19 @@ p {
 .loader__bg {
   position: absolute;
   inset: 0;
-  background: var(--terracotta);
+  background: var(--ink);
   transform-origin: top;
 }
 
 .loader__mark {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--cream);
-  font-family: var(--serif);
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  line-height: 0.9;
+  z-index: 1;
+  width: min(36rem, 88vmin);
+}
+
+.loader__logo {
+  width: 100%;
+  height: auto;
 }
 
 .nav {
@@ -133,7 +144,7 @@ p {
   height: calc(var(--nav-h) + var(--safe-top));
   padding: var(--safe-top) var(--gutter) 0;
   color: var(--cream);
-  background: linear-gradient(180deg, rgba(20, 12, 8, 0.55), transparent);
+  background: linear-gradient(180deg, rgba(var(--ink-rgb), 0.55), transparent);
   opacity: 0;
 }
 
@@ -144,7 +155,7 @@ p {
   right: var(--gutter);
   bottom: 0;
   height: 1px;
-  background: rgba(248, 239, 193, 0.28);
+  background: rgba(var(--gold-rgb), 0.42);
   opacity: var(--nav-line, 1);
   pointer-events: none;
 }
@@ -205,6 +216,10 @@ p {
   transform: translateY(4px);
 }
 
+.nav.is-open .nav__menu {
+  color: var(--gold);
+}
+
 .nav.is-open .nav__menu-icon span:first-child {
   transform: rotate(45deg);
 }
@@ -223,7 +238,7 @@ p {
     color: inherit;
   }
   40% {
-    color: var(--terracotta);
+    color: var(--gold);
   }
 }
 
@@ -247,15 +262,15 @@ p {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--cream);
+  background: var(--gold);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.45s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 .nav__book:focus-visible {
-  color: var(--terracotta);
-  border-color: var(--cream);
+  color: var(--ink);
+  border-color: var(--gold);
 }
 
 .nav__book:focus-visible::before {
@@ -270,7 +285,7 @@ p {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: var(--terracotta);
+  background: var(--ink);
   color: var(--cream);
   display: grid;
   place-items: center;
@@ -326,6 +341,7 @@ p {
 }
 
 .overlay.is-open a:focus-visible {
+  color: var(--gold);
   transform: translateX(0.55rem);
 }
 
@@ -345,7 +361,7 @@ p {
 }
 
 .hero {
-  background: var(--terracotta);
+  background: var(--ink);
   color: var(--cream);
   grid-template-rows: 1fr auto;
   align-items: stretch;
@@ -369,12 +385,34 @@ p {
 .scene__media {
   position: absolute;
   inset: 0;
-  background: var(--img) center / cover no-repeat;
+  overflow: hidden;
   transform-origin: center top;
+  backface-visibility: hidden;
 }
 
-.hero__media {
-  --img: url("/images/placeholder-hero.svg");
+.hero__media img,
+.scene__media img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.hero__media img {
+  object-position: center 22%;
+}
+
+#night .scene__media img {
+  object-position: center 28%;
+}
+
+#room .scene__media img {
+  object-position: center 32%;
 }
 
 .hero__media::after,
@@ -382,14 +420,16 @@ p {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(20, 12, 8, 0.12), rgba(20, 12, 8, 0.35));
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(var(--ink-rgb), 0.12), rgba(var(--ink-rgb), 0.35));
 }
 
 .scene--light .scene__media::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(248, 239, 193, 0.08), rgba(20, 12, 8, 0.06));
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(var(--cream-rgb), 0.08), rgba(var(--ink-rgb), 0.06));
 }
 
 .hero__veil {
@@ -419,12 +459,15 @@ p {
 
 .hero__content h1 {
   font-size: clamp(2.35rem, 10vw, 6.4rem);
-  max-width: 9ch;
+  max-width: 11ch;
+  overflow-wrap: normal;
 }
 
 .scene__copy h2 {
   font-size: clamp(2.05rem, 8vw, 4.6rem);
   max-width: 11ch;
+  overflow-wrap: normal;
+}
 }
 
 .scroll-hint {
@@ -513,8 +556,8 @@ body.is-ready .scroll-hint {
 .packages__grid {
   display: grid;
   gap: 1px;
-  background: rgba(20, 12, 8, 0.12);
-  border: 1px solid rgba(20, 12, 8, 0.12);
+  background: rgba(var(--ink-rgb), 0.12);
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
 }
 
 @media (min-width: 640px) {
@@ -549,12 +592,20 @@ body.is-ready .scroll-hint {
 }
 
 .pack:focus-visible {
-  background: var(--terracotta);
-  color: var(--cream);
+  background: var(--gold);
+  color: var(--ink);
 }
 
 .pack h3 {
   font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.pack__tag {
+  color: var(--gold-deep);
+}
+
+.pack:focus-visible .pack__tag {
+  color: inherit;
 }
 
 .pack__tag,
@@ -567,6 +618,10 @@ body.is-ready .scroll-hint {
   font-size: 0.68rem;
 }
 
+.events__date {
+  color: var(--gold);
+}
+
 .events {
   background: var(--ink);
 }
@@ -575,7 +630,7 @@ body.is-ready .scroll-hint {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid rgba(248, 239, 193, 0.2);
+  border-top: 1px solid rgba(var(--cream-rgb), 0.2);
 }
 
 .events__list button {
@@ -584,7 +639,7 @@ body.is-ready .scroll-hint {
   grid-template-columns: 1fr;
   gap: 0.35rem;
   padding: 1.5rem 0;
-  border-bottom: 1px solid rgba(248, 239, 193, 0.2);
+  border-bottom: 1px solid rgba(var(--cream-rgb), 0.2);
   text-align: left;
 }
 
@@ -635,11 +690,11 @@ body.is-ready .scroll-hint {
 .drinks__list {
   max-width: 72rem;
   margin: 0 auto;
-  border-top: 1px solid rgba(20, 12, 8, 0.14);
+  border-top: 1px solid rgba(var(--ink-rgb), 0.14);
 }
 
 .drinks__acc {
-  border-bottom: 1px solid rgba(20, 12, 8, 0.14);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.14);
 }
 
 .drinks__toggle {
@@ -659,7 +714,7 @@ body.is-ready .scroll-hint {
 }
 
 .drinks__toggle:focus-visible {
-  color: var(--terracotta);
+  color: var(--gold-deep);
 }
 
 .drinks__panel {
@@ -696,7 +751,7 @@ body.is-ready .scroll-hint {
   text-transform: uppercase;
   font-size: 0.66rem;
   font-weight: 500;
-  color: var(--terracotta);
+  color: var(--gold-deep);
   text-align: center;
 }
 
@@ -709,7 +764,7 @@ body.is-ready .scroll-hint {
   grid-template-columns: 1fr;
   gap: 0.2rem;
   padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(20, 12, 8, 0.08);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
 }
 
 .drink-row:last-child {
@@ -768,7 +823,7 @@ body.is-ready .scroll-hint {
 
 .foot {
   background: var(--ink-soft);
-  border-top: 1px solid rgba(248, 239, 193, 0.12);
+  border-top: 1px solid rgba(var(--cream-rgb), 0.12);
 }
 
 .foot__grid {
@@ -884,23 +939,23 @@ body.is-ready .scroll-hint {
   font-size: 0.68rem;
 }
 
-.datepicker {
+.book-drop {
   position: relative;
   display: grid;
   gap: 0.45rem;
 }
 
-.datepicker > span {
+.book-drop > span {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 0.68rem;
 }
 
-.datepicker__trigger {
+.book-drop__trigger {
   width: 100%;
   text-align: left;
   border: 0;
-  border-bottom: 1px solid rgba(20, 12, 8, 0.35);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.35);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -910,7 +965,7 @@ body.is-ready .scroll-hint {
   position: relative;
 }
 
-.datepicker__trigger::after {
+.book-drop__trigger::after {
   content: "";
   position: absolute;
   right: 0;
@@ -924,24 +979,24 @@ body.is-ready .scroll-hint {
   transition: transform 0.3s ease;
 }
 
-.datepicker.is-open .datepicker__trigger {
-  border-bottom-color: var(--terracotta);
-  color: var(--terracotta);
+.book-drop.is-open .book-drop__trigger {
+  border-bottom-color: var(--gold-deep);
+  color: var(--gold-deep);
 }
 
-.datepicker.is-open .datepicker__trigger::after {
+.book-drop.is-open .book-drop__trigger::after {
   transform: translateY(-20%) rotate(225deg);
 }
 
-.datepicker__trigger [data-date-label] {
+.book-drop__trigger > span {
   opacity: 0.45;
 }
 
-.datepicker__trigger.is-filled [data-date-label] {
+.book-drop__trigger.is-filled > span {
   opacity: 1;
 }
 
-.datepicker__pop {
+.book-drop__pop {
   display: grid;
   grid-template-rows: 0fr;
   overflow: hidden;
@@ -954,17 +1009,39 @@ body.is-ready .scroll-hint {
     border-color 0.4s ease;
 }
 
-.datepicker.is-open .datepicker__pop {
+.book-drop.is-open .book-drop__pop {
   grid-template-rows: 1fr;
   opacity: 1;
-  border-top-color: rgba(208, 79, 24, 0.35);
+  border-top-color: rgba(var(--gold-rgb), 0.35);
   pointer-events: auto;
 }
 
-.datepicker__body {
+.book-drop__body {
   min-height: 0;
   overflow: hidden;
   padding: 1.2rem 0 0.4rem;
+}
+
+.book-drop__options {
+  display: grid;
+}
+
+.book-drop__options button {
+  width: 100%;
+  text-align: left;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.book-drop__options button:last-child {
+  border-bottom: 0;
+}
+
+.book-drop__options button.is-selected {
+  color: var(--gold-deep);
 }
 
 .datepicker__nav {
@@ -1002,7 +1079,7 @@ body.is-ready .scroll-hint {
 
 .datepicker__week {
   margin-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(20, 12, 8, 0.12);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.12);
   padding-bottom: 0.35rem;
 }
 
@@ -1011,8 +1088,7 @@ body.is-ready .scroll-hint {
   font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--terracotta);
-  padding: 0.2rem 0;
+  color: var(--gold-deep);
 }
 
 .datepicker__grid button {
@@ -1024,12 +1100,12 @@ body.is-ready .scroll-hint {
 }
 
 .datepicker__grid button.is-today {
-  box-shadow: inset 0 0 0 1px var(--terracotta);
+  box-shadow: inset 0 0 0 1px var(--gold);
 }
 
 .datepicker__grid button.is-selected {
-  background: var(--terracotta);
-  color: var(--cream);
+  background: var(--gold);
+  color: var(--ink);
 }
 
 .datepicker__grid button:disabled {
@@ -1041,12 +1117,11 @@ body.is-ready .scroll-hint {
   pointer-events: none;
 }
 
-.book input,
-.book select {
+.book input {
   appearance: none;
   width: 100%;
   border: 0;
-  border-bottom: 1px solid rgba(20, 12, 8, 0.35);
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.35);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -1084,10 +1159,16 @@ body.is-ready .scroll-hint {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--terracotta);
+  background: var(--gold);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.55s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.book form > button:focus-visible,
+.book__pay:focus-visible:not(:disabled),
+.book__done button:focus-visible {
+  color: var(--ink);
 }
 
 .book form > button:focus-visible::before,
@@ -1116,7 +1197,7 @@ body.is-ready .scroll-hint {
 
 .seat-map-wrap {
   overflow: hidden;
-  border: 1px solid rgba(20, 12, 8, 0.12);
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
 }
 
 .floorplan {
@@ -1135,19 +1216,19 @@ body.is-ready .scroll-hint {
 
 .floorplan__room {
   fill: none;
-  stroke: rgba(20, 12, 8, 0.22);
+  stroke: rgba(var(--ink-rgb), 0.22);
   stroke-width: 1.2;
 }
 
 .floorplan__marks {
   fill: none;
-  stroke: rgba(20, 12, 8, 0.28);
+  stroke: rgba(var(--ink-rgb), 0.28);
   stroke-width: 1.2;
 }
 
 .floorplan__zones rect {
-  fill: rgba(20, 12, 8, 0.04);
-  stroke: rgba(20, 12, 8, 0.38);
+  fill: rgba(var(--ink-rgb), 0.04);
+  stroke: rgba(var(--ink-rgb), 0.38);
   stroke-width: 1.2;
 }
 
@@ -1161,7 +1242,7 @@ body.is-ready .scroll-hint {
 }
 
 .floorplan__labels .floorplan__quiet {
-  fill: rgba(20, 12, 8, 0.42);
+  fill: rgba(var(--ink-rgb), 0.42);
 }
 
 .seat {
@@ -1175,7 +1256,7 @@ body.is-ready .scroll-hint {
 
 .seat.is-on,
 .seat:focus-visible {
-  background: rgba(208, 79, 24, 0.2);
+  background: rgba(var(--gold-rgb), 0.2);
 }
 
 .seat--out {
@@ -1218,7 +1299,7 @@ body.is-ready .scroll-hint {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 0.68rem;
-  color: var(--terracotta);
+  color: var(--gold-deep);
 }
 
 .book__pay {
@@ -1236,7 +1317,7 @@ body.is-ready .scroll-hint {
 
 .book__back:focus-visible {
   opacity: 1;
-  color: var(--terracotta);
+  color: var(--gold-deep);
 }
 
 .is-locked {
@@ -1245,23 +1326,26 @@ body.is-ready .scroll-hint {
 
 @media (hover: hover) and (pointer: fine) {
   .nav__menu:hover {
-    color: var(--terracotta);
+    color: var(--gold);
   }
 
   .nav__book:hover {
-    color: var(--terracotta);
-    border-color: var(--cream);
+    color: var(--ink);
+    border-color: var(--gold);
   }
 
   .nav__book:hover::before {
     transform: scaleX(1);
   }
 
-  .overlay.is-open a:hover {
+  .overlay.is-open a:hover,
+  .overlay.is-open a:focus-visible {
+    color: var(--gold);
     transform: translateX(0.55rem);
   }
 
-  .overlay.is-open a:hover::after {
+  .overlay.is-open a:hover::after,
+  .overlay.is-open a:focus-visible::after {
     transform: scaleX(1);
   }
 
@@ -1275,17 +1359,31 @@ body.is-ready .scroll-hint {
   }
 
   .pack:hover {
-    background: var(--terracotta);
-    color: var(--cream);
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  .pack:hover .pack__tag {
+    color: inherit;
   }
 
   .datepicker__nav button:hover {
     opacity: 1;
-    color: var(--terracotta);
+    color: var(--gold-deep);
   }
 
   .datepicker__grid button:hover:not(:disabled):not(.is-selected) {
-    background: rgba(208, 79, 24, 0.1);
+    background: rgba(var(--gold-rgb), 0.1);
+  }
+
+  .book-drop__options button:hover {
+    color: var(--gold-deep);
+  }
+
+  .book form > button:hover,
+  .book__pay:hover:not(:disabled),
+  .book__done button:hover {
+    color: var(--ink);
   }
 
   .book form > button:hover::before,
@@ -1296,15 +1394,15 @@ body.is-ready .scroll-hint {
 
   .book__back:hover {
     opacity: 1;
-    color: var(--terracotta);
+    color: var(--gold-deep);
   }
 
   .seat:hover {
-    background: rgba(208, 79, 24, 0.1);
+    background: rgba(var(--gold-rgb), 0.1);
   }
 
   .drinks__toggle:hover {
-    color: var(--terracotta);
+    color: var(--gold-deep);
   }
 }
 

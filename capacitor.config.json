@@ -2,14 +2,14 @@
   "appId": "com.cornercouch.app",
   "appName": "CornerCouch",
   "webDir": "dist",
-  "backgroundColor": "#140c08",
+  "backgroundColor": "#0a0a0a",
   "server": {
     "androidScheme": "https"
   },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0,
-      "backgroundColor": "#140c08",
+      "backgroundColor": "#0a0a0a",
       "showSpinner": false
     }
   }

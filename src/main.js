@@ -57,14 +57,12 @@ function playIntro() {
 
   const intro = gsap.timeline();
   intro
-    .from(".loader__word", {
-      y: 28,
-      opacity: 0,
-      duration: 0.55,
-      stagger: 0.1,
-      ease: "power3.out",
-    })
-    .to(".loader__mark", { opacity: 0, duration: 0.28, delay: 0.12 })
+    .fromTo(
+      ".loader__mark",
+      { scale: 0.985 },
+      { scale: 1, duration: 0.8, ease: "power2.out" },
+    )
+    .to(".loader__mark", { opacity: 0, duration: 0.32, delay: 0.35 })
     .to(".loader__bg", {
       scaleY: 0,
       duration: 0.8,
@@ -104,9 +102,19 @@ function playIntro() {
 }
 
 const fontsReady = document.fonts?.ready ?? Promise.resolve();
-Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 1200))]).then(
-  () => requestAnimationFrame(playIntro),
-);
+const logoImg = document.querySelector(".loader__logo");
+const logoReady =
+  !logoImg || logoImg.complete
+    ? Promise.resolve()
+    : new Promise((resolve) => {
+        logoImg.addEventListener("load", resolve, { once: true });
+        logoImg.addEventListener("error", resolve, { once: true });
+      });
+
+Promise.race([
+  Promise.all([fontsReady, logoReady]),
+  new Promise((resolve) => setTimeout(resolve, 1800)),
+]).then(() => requestAnimationFrame(playIntro));
 
 document.querySelector(".scroll-hint")?.addEventListener("click", (event) => {
   event.preventDefault();
@@ -301,6 +309,7 @@ const dateLabel = dateTrigger?.querySelector("[data-date-label]");
 const datePop = document.querySelector("#datePop");
 const dateGrid = datePop?.querySelector("[data-cal-grid]");
 const dateMonth = datePop?.querySelector("[data-cal-month]");
+const bookDrops = [...bookForm.querySelectorAll(".book-drop")];
 const monthNames = [
   "January",
   "February",
@@ -343,9 +352,47 @@ function setPickedDate(iso) {
   renderCalendar();
 }
 
+function closeDrop(drop) {
+  drop?.classList.remove("is-open");
+  drop?.querySelector(".book-drop__trigger")?.setAttribute("aria-expanded", "false");
+}
+
+function closeAllDrops(except) {
+  bookDrops.forEach((drop) => {
+    if (drop !== except) closeDrop(drop);
+  });
+}
+
+function openDrop(drop) {
+  if (!drop) return;
+  closeAllDrops(drop);
+  drop.classList.add("is-open");
+  drop.querySelector(".book-drop__trigger")?.setAttribute("aria-expanded", "true");
+}
+
+function setDropValue(name, value) {
+  const input = bookForm?.elements[name];
+  if (!input || value == null) return;
+  const drop = input.closest(".book-drop");
+  if (!drop) {
+    input.value = value;
+    return;
+  }
+  const option = drop.querySelector(`[data-drop-option][data-value="${value}"]`);
+  if (!option) return;
+  input.value = value;
+  const label = drop.querySelector("[data-drop-label]");
+  if (label) label.textContent = option.textContent.trim();
+  drop.querySelector(".book-drop__trigger")?.classList.add("is-filled");
+  drop.querySelectorAll("[data-drop-option]").forEach((btn) => {
+    const on = btn === option;
+    btn.classList.toggle("is-selected", on);
+    btn.setAttribute("aria-selected", on ? "true" : "false");
+  });
+}
+
 function closeDatepicker() {
-  datepicker?.classList.remove("is-open");
-  dateTrigger?.setAttribute("aria-expanded", "false");
+  closeDrop(datepicker);
 }
 
 function animateCalendarIn() {
@@ -359,8 +406,7 @@ function animateCalendarIn() {
 }
 
 function openDatepicker() {
-  datepicker?.classList.add("is-open");
-  dateTrigger?.setAttribute("aria-expanded", "true");
+  openDrop(datepicker);
   renderCalendar();
   animateCalendarIn();
 }
@@ -410,6 +456,22 @@ dateTrigger?.addEventListener("click", () => {
   else openDatepicker();
 });
 
+bookDrops.forEach((drop) => {
+  if (drop.classList.contains("datepicker")) return;
+  const trigger = drop.querySelector(".book-drop__trigger");
+  trigger?.addEventListener("click", () => {
+    if (drop.classList.contains("is-open")) closeDrop(drop);
+    else openDrop(drop);
+  });
+  drop.querySelectorAll("[data-drop-option]").forEach((option) => {
+    option.addEventListener("click", () => {
+      const input = drop.querySelector("input[type=hidden]");
+      if (input) setDropValue(input.name, option.dataset.value);
+      closeDrop(drop);
+    });
+  });
+});
+
 datePop?.querySelector("[data-cal-prev]")?.addEventListener("click", () => {
   calCursor.setMonth(calCursor.getMonth() - 1);
   renderCalendar();
@@ -423,9 +485,10 @@ datePop?.querySelector("[data-cal-next]")?.addEventListener("click", () => {
 });
 
 document.addEventListener("pointerdown", (event) => {
-  if (!datepicker?.classList.contains("is-open")) return;
-  if (datepicker.contains(event.target)) return;
-  closeDatepicker();
+  const openDropEl = bookDrops.find((drop) => drop.classList.contains("is-open"));
+  if (!openDropEl) return;
+  if (openDropEl.contains(event.target)) return;
+  closeDrop(openDropEl);
 });
 
 function resetSeatStep() {
@@ -466,7 +529,7 @@ function openBook({ date, pack } = {}, trigger) {
   resetSeatStep();
   showBookStep("form");
   if (date) setPickedDate(date);
-  if (pack) bookForm.pack.value = pack;
+  if (pack) setDropValue("pack", pack);
 
   if (trigger?.classList.contains("nav__book") && !reduceMotion) {
     gsap.fromTo(
@@ -477,7 +540,7 @@ function openBook({ date, pack } = {}, trigger) {
   }
 
   if (bookOpen) {
-    bookForm.querySelector("input, select")?.focus();
+    bookForm.querySelector("#dateTrigger")?.focus();
     return;
   }
 
@@ -490,7 +553,7 @@ function openBook({ date, pack } = {}, trigger) {
   const inner = bookPanel.querySelector(".book__inner");
   const closeBtn = bookPanel.querySelector(".book__close");
   const scroll = bookPanel.querySelector(".book__scroll");
-  const pieces = inner.querySelectorAll(".kicker, h2, .datepicker, label, form > button");
+  const pieces = inner.querySelectorAll(".kicker, h2, .book-drop, label, form > button");
 
   if (scroll) scroll.scrollTop = 0;
   gsap.set([inner, closeBtn], { opacity: 1, y: 0, clearProps: "transform" });
@@ -498,7 +561,7 @@ function openBook({ date, pack } = {}, trigger) {
   if (reduceMotion) {
     gsap.set(bookPanel, { autoAlpha: 1, clipPath: "none" });
     gsap.set(pieces, { opacity: 1, y: 0 });
-    bookForm.querySelector("input, select")?.focus();
+    bookForm.querySelector("#dateTrigger")?.focus();
     return;
   }
 
@@ -506,7 +569,7 @@ function openBook({ date, pack } = {}, trigger) {
     .timeline({
       onComplete: () => {
         gsap.set(bookPanel, { clipPath: "none" });
-        bookForm.querySelector("input, select")?.focus();
+        bookForm.querySelector("#dateTrigger")?.focus();
       },
     })
     .set(bookPanel, { autoAlpha: 1 })
@@ -534,7 +597,7 @@ function closeBook({ immediate = false } = {}) {
     return;
   }
 
-  closeDatepicker();
+  closeAllDrops();
   bookOpen = false;
   bookPanel.classList.remove("is-open");
   bookTween?.kill();
@@ -613,6 +676,10 @@ document.querySelector("[data-close-done]")?.addEventListener("click", closeBook
 
 document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
+  if (bookDrops.some((drop) => drop.classList.contains("is-open"))) {
+    closeAllDrops();
+    return;
+  }
   if (menuOpen) closeMenu();
   if (bookOpen) closeBook();
 });
