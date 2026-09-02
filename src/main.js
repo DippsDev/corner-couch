@@ -1,14 +1,8 @@
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
-
-gsap.registerPlugin(ScrollTrigger);
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 window.scrollTo(0, 0);
 
-const menu = document.querySelector("#menu");
-const menuBtn = document.querySelector("#menuBtn");
 const bookPanel = document.querySelector("#bookPanel");
 const bookForm = document.querySelector("#bookForm");
 const bookDone = document.querySelector("#bookDone");
@@ -19,41 +13,92 @@ const bookTitle = document.querySelector("#bookTitle");
 const paySeat = document.querySelector("#paySeat");
 const seatChoice = document.querySelector("#seatChoice");
 const seatButtons = [...document.querySelectorAll(".seat")];
-let pendingBooking = null;
-let selectedSeat = "";
 const loader = document.querySelector("#loader");
+const nav = document.querySelector("#nav");
+const screens = [...document.querySelectorAll(".screen")];
+const dockItems = [...document.querySelectorAll(".dock-item")];
+const dockPanel = document.querySelector("#dock");
+const homeVideo = document.querySelector("#homeVideo");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 const packNames = {
   "open-bar": "Open bar",
   "vip-couch": "The couch",
   birthday: "The party",
 };
 
-const lenis = new Lenis({
-  autoRaf: true,
-  lerp: 0.08,
-});
+let pendingBooking = null;
+let selectedSeat = "";
+let currentScreen = "home";
+let bookOpen = false;
+let bookTween;
+let dockTween;
 
-lenis.on("scroll", ScrollTrigger.update);
-lenis.stop();
+function lock(on) {
+  document.body.classList.toggle("is-locked", on);
+}
 
 function revealPage() {
   window.scrollTo(0, 0);
-  lenis.scrollTo(0, { immediate: true });
   document.body.classList.add("is-ready");
   if (loader) {
     loader.setAttribute("aria-hidden", "true");
     loader.style.display = "none";
   }
-  lenis.start();
+  playHomeMedia();
+}
+
+function cueDock({ pace = "return" } = {}) {
+  if (reduceMotion) {
+    gsap.set([".dock-outer", ".dock-panel", ".dock-item"], { opacity: 1, y: 0, scale: 1 });
+    return;
+  }
+
+  const fast = pace === "return";
+  dockTween?.kill();
+  gsap.set(".dock-outer", { opacity: 1 });
+  gsap.set(".dock-panel", {
+    y: fast ? 92 : 132,
+    opacity: 0,
+    scale: fast ? 0.96 : 0.94,
+  });
+  gsap.set(".dock-item", { y: fast ? 12 : 16, opacity: 0 });
+
+  dockTween = gsap
+    .timeline()
+    .to(".dock-panel", {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      duration: fast ? 0.55 : 1.05,
+      ease: fast ? "back.out(1.22)" : "back.out(1.4)",
+    })
+    .to(
+      ".dock-item",
+      {
+        y: 0,
+        opacity: 1,
+        duration: fast ? 0.26 : 0.42,
+        stagger: fast ? 0.04 : 0.07,
+        ease: "power2.out",
+      },
+      fast ? "-=0.36" : "-=0.62",
+    );
 }
 
 function playIntro() {
   if (reduceMotion) {
-    gsap.set([".nav", ".hero__content", ".scroll-hint"], { opacity: 1, y: 0 });
+    gsap.set([".nav", ".home__content", ".dock-outer", ".dock-panel", ".dock-item"], {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+    });
     revealPage();
     return;
   }
+
+  gsap.set(".dock-outer", { opacity: 0 });
+  gsap.set(".dock-panel", { y: 132, opacity: 0, scale: 0.94 });
 
   const intro = gsap.timeline();
   intro
@@ -76,29 +121,12 @@ function playIntro() {
       "-=0.35",
     )
     .fromTo(
-      ".nav__menu-icon span",
-      { width: 0 },
-      {
-        width: "100%",
-        duration: 0.45,
-        stagger: 0.1,
-        ease: "power3.out",
-        onComplete: cueMenu,
-      },
-      "-=0.28",
-    )
-    .fromTo(
-      ".hero__content",
+      ".home__content",
       { y: 18, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
       "-=0.4",
     )
-    .fromTo(
-      ".scroll-hint",
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-      "-=0.35",
-    );
+    .add(() => cueDock({ pace: "intro" }), "+=0.28");
 }
 
 const fontsReady = document.fonts?.ready ?? Promise.resolve();
@@ -116,191 +144,211 @@ Promise.race([
   new Promise((resolve) => setTimeout(resolve, 1800)),
 ]).then(() => requestAnimationFrame(playIntro));
 
-document.querySelector(".scroll-hint")?.addEventListener("click", (event) => {
-  event.preventDefault();
-  const target = document.querySelector("#night");
-  if (!target) return;
-  lenis.scrollTo(target, { duration: 1.35, offset: 0 });
+const homeClips = import.meta.glob("./assets/home.{mp4,webm}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const homeClip = Object.values(homeClips)[0];
+
+function playHomeMedia() {
+  if (!homeVideo || !homeClip || reduceMotion) return;
+  homeVideo.src = homeClip;
+  homeVideo.muted = true;
+  homeVideo.playsInline = true;
+  homeVideo.loop = true;
+  const start = () => {
+    homeVideo.classList.add("is-on");
+    homeVideo.play().catch(() => homeVideo.classList.remove("is-on"));
+  };
+  if (homeVideo.readyState >= 2) start();
+  else homeVideo.addEventListener("canplay", start, { once: true });
+}
+
+function pauseHomeMedia() {
+  if (!homeVideo?.classList.contains("is-on")) return;
+  homeVideo.pause();
+}
+
+const themeColor = document.querySelector('meta[name="theme-color"]');
+const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+function systemTheme() {
+  return colorScheme.matches ? "dark" : "light";
+}
+
+function applyTheme() {
+  const theme = systemTheme();
+  document.documentElement.dataset.theme = theme;
+  document.body.dataset.theme = theme;
+  if (themeColor) themeColor.setAttribute("content", theme === "light" ? "#f6f6f4" : "#0a0a0a");
+}
+
+function syncDock(next) {
+  dockItems.forEach((item) => {
+    const on = item.dataset.screen === next;
+    item.classList.toggle("is-active", on);
+    item.setAttribute("aria-selected", on ? "true" : "false");
+  });
+}
+
+function activateScreen(next) {
+  screens.forEach((screen) => {
+    const on = screen.dataset.screen === next;
+    screen.classList.toggle("is-active", on);
+    if (on) screen.scrollTop = 0;
+  });
+  syncDock(next);
+  if (next === "home") playHomeMedia();
+  else pauseHomeMedia();
+}
+
+function showScreen(id, { hash = true } = {}) {
+  const next = screens.find((screen) => screen.dataset.screen === id) ? id : "home";
+  currentScreen = next;
+  document.body.dataset.screen = next;
+  activateScreen(next);
+  if (hash) {
+    const url = next === "home" ? location.pathname + location.search : `#${next}`;
+    history.replaceState(null, "", url);
+  }
+}
+
+applyTheme();
+colorScheme.addEventListener("change", applyTheme);
+
+dockItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    if (bookOpen) closeBook({ immediate: true });
+    showScreen(item.dataset.screen);
+  });
 });
 
 document.querySelector(".nav__logo")?.addEventListener("click", (event) => {
   event.preventDefault();
-  if (menuOpen) closeMenu({ immediate: true });
   if (bookOpen) closeBook({ immediate: true });
-
-  const distance = lenis.scroll;
-  if (distance < 8) return;
-
-  if (reduceMotion) {
-    lenis.scrollTo(0, { immediate: true });
-    return;
-  }
-
-  const duration = Math.min(2.4, Math.max(1.35, (distance / window.innerHeight) * 0.72));
-  lenis.scrollTo(0, { duration, offset: 0 });
+  showScreen("home");
 });
 
-const stackPanels = gsap.utils.toArray(".stack > .hero, .stack > .scene");
-
-stackPanels.forEach((panel, index) => {
-  const next = stackPanels[index + 1];
-  if (!next) return;
-
-  const media = panel.querySelector(".hero__media, .scene__media");
-  const copy = panel.querySelectorAll(".hero__content, .scene__copy, .scroll-hint");
-
-  gsap.fromTo(
-    media,
-    { scale: 1, filter: "blur(0px)" },
-    {
-      scale: 1.12,
-      filter: "blur(10px)",
-      ease: "none",
-      scrollTrigger: {
-        trigger: next,
-        start: "top bottom",
-        end: "top top",
-        scrub: true,
-        immediateRender: false,
-      },
-    },
-  );
-
-  if (copy.length) {
-    gsap.fromTo(
-      copy,
-      { opacity: 1 },
-      {
-        opacity: 0.2,
-        ease: "none",
-        scrollTrigger: {
-          trigger: next,
-          start: "top bottom",
-          end: "top top",
-          scrub: true,
-          immediateRender: false,
-        },
-      },
-    );
-  }
-});
-
-function lock(on) {
-  document.body.classList.toggle("is-locked", on);
-  if (on) lenis.stop();
-  else if (document.body.classList.contains("is-ready")) lenis.start();
+const initialHash = location.hash.replace("#", "");
+if (initialHash && screens.some((screen) => screen.dataset.screen === initialHash)) {
+  showScreen(initialHash, { hash: false });
+} else {
+  showScreen("home", { hash: false });
 }
 
-const nav = document.querySelector("#nav");
-let menuOpen = false;
-let menuTween;
+function initDockMagnify() {
+  if (!dockPanel || reduceMotion) return;
 
-lenis.on("scroll", ({ scroll }) => {
-  if (!nav) return;
-  nav.style.setProperty("--nav-line", String(1 - Math.min(1, scroll / 160)));
-});
+  const base = 50;
+  const mag = 70;
+  const distance = 200;
+  const stiffness = 0.28;
+  const damping = 0.62;
+  const sizes = dockItems.map(() => base);
+  const velocities = dockItems.map(() => 0);
+  let targets = dockItems.map(() => base);
+  let mouseX = Infinity;
+  let hovering = false;
+  let raf = 0;
 
-function setMenuChrome(open) {
-  menuBtn?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-}
-
-function cueMenu() {
-  if (!menuBtn || reduceMotion || menuOpen) return;
-  menuBtn.classList.add("is-hinting");
-  window.setTimeout(() => menuBtn.classList.remove("is-hinting"), 4800);
-}
-
-function openMenu() {
-  if (menuOpen) return;
-  menuOpen = true;
-  menuBtn.classList.remove("is-hinting");
-  menuBtn.setAttribute("aria-expanded", "true");
-  setMenuChrome(true);
-  menu.setAttribute("aria-hidden", "false");
-  nav.classList.add("is-open");
-  menu.classList.add("is-open");
-  lock(true);
-
-  const links = menu.querySelectorAll("a");
-  const kicker = menu.querySelector(".kicker");
-  menuTween?.kill();
-
-  if (reduceMotion) {
-    gsap.set(menu, { autoAlpha: 1, clipPath: "inset(0)" });
-    gsap.set([kicker, links], { opacity: 1, y: 0 });
-    return;
+  function setSizes() {
+    dockItems.forEach((item, index) => {
+      const size = sizes[index];
+      item.style.width = `${size}px`;
+      item.style.height = `${size}px`;
+    });
   }
 
-  menuTween = gsap
-    .timeline()
-    .set(menu, { autoAlpha: 1 })
-    .fromTo(
-      menu,
-      { clipPath: "inset(0 0 100% 0)" },
-      { clipPath: "inset(0% 0 0% 0)", duration: 0.75, ease: "power4.inOut" },
-    )
-    .fromTo(
-      kicker,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
-      "-=0.28",
-    )
-    .fromTo(
-      links,
-      { y: 40, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.55,
-        stagger: 0.06,
-        ease: "power3.out",
-        onComplete: () => gsap.set(links, { clearProps: "opacity,transform" }),
-      },
-      "-=0.28",
-    );
-}
-
-function closeMenu({ immediate = false } = {}) {
-  if (!menuOpen && menu.getAttribute("aria-hidden") === "true") {
-    lock(false);
-    return;
+  function tick() {
+    let moving = false;
+    dockItems.forEach((item, index) => {
+      const force = (targets[index] - sizes[index]) * stiffness;
+      velocities[index] = (velocities[index] + force) * damping;
+      sizes[index] += velocities[index];
+      if (Math.abs(velocities[index]) > 0.05 || Math.abs(targets[index] - sizes[index]) > 0.2) {
+        moving = true;
+      } else {
+        sizes[index] = targets[index];
+        velocities[index] = 0;
+      }
+    });
+    setSizes();
+    raf = moving || hovering ? requestAnimationFrame(tick) : 0;
   }
 
-  menuOpen = false;
-  menuBtn.setAttribute("aria-expanded", "false");
-  setMenuChrome(false);
-  nav.classList.remove("is-open");
-  menu.classList.remove("is-open");
-  menuTween?.kill();
-
-  const finish = () => {
-    menu.setAttribute("aria-hidden", "true");
-    gsap.set(menu, { autoAlpha: 0, clipPath: "inset(0 0 100% 0)" });
-    lock(false);
-  };
-
-  if (immediate || reduceMotion) {
-    finish();
-    return;
+  function startTick() {
+    if (!raf) raf = requestAnimationFrame(tick);
   }
 
-  const links = menu.querySelectorAll("a");
-  const kicker = menu.querySelector(".kicker");
-  menuTween = gsap
-    .timeline({ onComplete: finish })
-    .to([kicker, links], {
-      opacity: 0,
-      y: -16,
-      duration: 0.22,
-      stagger: 0.025,
-      ease: "power2.in",
-    })
-    .to(
-      menu,
-      { clipPath: "inset(0 0 100% 0)", duration: 0.55, ease: "power4.inOut" },
-      "-=0.05",
-    );
+  function updateTargets() {
+    dockItems.forEach((item, index) => {
+      const rect = item.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
+      const delta = Math.abs(mouseX - center);
+      targets[index] = delta >= distance ? base : base + (mag - base) * (1 - delta / distance);
+    });
+    startTick();
+  }
+
+  function enable() {
+    dockPanel.addEventListener("mousemove", onMove);
+    dockPanel.addEventListener("mouseleave", onLeave);
+    dockItems.forEach((item) => {
+      item.addEventListener("mouseenter", onItemEnter);
+      item.addEventListener("mouseleave", onItemLeave);
+      item.addEventListener("focus", onItemEnter);
+      item.addEventListener("blur", onItemLeave);
+    });
+  }
+
+  function disable() {
+    dockPanel.removeEventListener("mousemove", onMove);
+    dockPanel.removeEventListener("mouseleave", onLeave);
+    dockItems.forEach((item) => {
+      item.classList.remove("is-label-on");
+      item.removeEventListener("mouseenter", onItemEnter);
+      item.removeEventListener("mouseleave", onItemLeave);
+      item.removeEventListener("focus", onItemEnter);
+      item.removeEventListener("blur", onItemLeave);
+      item.style.width = "";
+      item.style.height = "";
+    });
+    hovering = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+  }
+
+  function onMove(event) {
+    hovering = true;
+    mouseX = event.clientX;
+    updateTargets();
+  }
+
+  function onLeave() {
+    hovering = false;
+    mouseX = Infinity;
+    targets = dockItems.map(() => base);
+    dockItems.forEach((item) => item.classList.remove("is-label-on"));
+    startTick();
+  }
+
+  function onItemEnter(event) {
+    event.currentTarget.classList.add("is-label-on");
+  }
+
+  function onItemLeave(event) {
+    event.currentTarget.classList.remove("is-label-on");
+  }
+
+  if (finePointer.matches) enable();
+  finePointer.addEventListener("change", (event) => {
+    if (event.matches) enable();
+    else disable();
+  });
 }
+
+initDockMagnify();
 
 const datepicker = document.querySelector(".datepicker");
 const dateInput = bookForm.querySelector("input[name=date]");
@@ -521,11 +569,7 @@ function showBookStep(step) {
   if (scroll) scroll.scrollTop = 0;
 }
 
-let bookOpen = false;
-let bookTween;
-
 function openBook({ date, pack } = {}, trigger) {
-  closeMenu({ immediate: true });
   resetSeatStep();
   showBookStep("form");
   if (date) setPickedDate(date);
@@ -634,31 +678,6 @@ function closeBook({ immediate = false } = {}) {
     );
 }
 
-menuBtn.addEventListener("click", () => {
-  if (menuOpen) closeMenu();
-  else openMenu();
-});
-
-menu.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const href = link.getAttribute("href");
-    if (!href?.startsWith("#")) {
-      closeMenu();
-      return;
-    }
-
-    event.preventDefault();
-    closeMenu({ immediate: true });
-    const target = document.querySelector(href);
-    if (!target) return;
-    lenis.scrollTo(target, {
-      duration: reduceMotion ? 0 : 1.35,
-      offset: 0,
-      immediate: reduceMotion,
-    });
-  });
-});
-
 document.querySelectorAll("[data-open-book]").forEach((el) => {
   el.addEventListener("click", () => {
     openBook(
@@ -680,7 +699,6 @@ document.addEventListener("keydown", (event) => {
     closeAllDrops();
     return;
   }
-  if (menuOpen) closeMenu();
   if (bookOpen) closeBook();
 });
 
@@ -726,7 +744,8 @@ document.querySelector("[data-seat-back]")?.addEventListener("click", () => {
 });
 
 const drinkAccordions = [...document.querySelectorAll(".drinks__acc")];
-const drinkDur = 0.72;
+const drinkScreen = document.querySelector(".screen--menu");
+const drinkDur = 420;
 const drinkEase = (t) => 1 - (1 - t) ** 3;
 
 function drinkNavOffset() {
@@ -734,7 +753,8 @@ function drinkNavOffset() {
 }
 
 function drinkTargetScroll(toggle) {
-  const current = lenis.animatedScroll;
+  if (!drinkScreen) return 0;
+  const current = drinkScreen.scrollTop;
   const toggleTop = toggle.getBoundingClientRect().top;
   let collapseAbove = 0;
 
@@ -749,7 +769,7 @@ function drinkTargetScroll(toggle) {
     }
   });
 
-  return Math.max(0, current + toggleTop - drinkNavOffset() - collapseAbove);
+  return Math.max(0, current + toggleTop - drinkScreen.getBoundingClientRect().top - drinkNavOffset() - collapseAbove);
 }
 
 function closeDrink(acc) {
@@ -759,9 +779,30 @@ function closeDrink(acc) {
   toggle?.setAttribute("aria-expanded", "false");
 }
 
+function scrollDrinkScreen(top) {
+  if (!drinkScreen) return;
+  if (reduceMotion) {
+    drinkScreen.scrollTo({ top, behavior: "auto" });
+    return;
+  }
+
+  const start = drinkScreen.scrollTop;
+  const delta = top - start;
+  if (Math.abs(delta) < 2) return;
+  const t0 = performance.now();
+
+  function step(now) {
+    const t = Math.min(1, (now - t0) / drinkDur);
+    drinkScreen.scrollTop = start + delta * drinkEase(t);
+    if (t < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+}
+
 function openDrink(acc) {
   const toggle = acc.querySelector(".drinks__toggle");
-  const targetScroll = toggle ? drinkTargetScroll(toggle) : lenis.animatedScroll;
+  const targetScroll = toggle ? drinkTargetScroll(toggle) : drinkScreen?.scrollTop ?? 0;
 
   drinkAccordions.forEach((other) => {
     if (other !== acc) closeDrink(other);
@@ -769,32 +810,14 @@ function openDrink(acc) {
 
   acc.classList.add("is-open");
   toggle?.setAttribute("aria-expanded", "true");
-
   if (!toggle) return;
-
-  if (reduceMotion) {
-    lenis.scrollTo(targetScroll, { immediate: true });
-    return;
-  }
-
-  if (Math.abs(targetScroll - lenis.animatedScroll) < 2) return;
-
-  lenis.scrollTo(targetScroll, {
-    duration: drinkDur,
-    easing: drinkEase,
-    programmatic: true,
-  });
+  scrollDrinkScreen(targetScroll);
 }
 
 drinkAccordions.forEach((acc) => {
   const toggle = acc.querySelector(".drinks__toggle");
-  const panel = acc.querySelector(".drinks__panel");
-  const inner = panel?.querySelector(".drinks__panel-inner");
-  gsap.killTweensOf([panel, inner]);
-  gsap.set([panel, inner].filter(Boolean), { clearProps: "height,overflow,transform,opacity" });
   toggle?.addEventListener("click", () => {
     if (acc.classList.contains("is-open")) closeDrink(acc);
     else openDrink(acc);
   });
 });
-

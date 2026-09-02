@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -25,14 +25,15 @@
     />
     <script>
       if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
       window.scrollTo(0, 0);
+      document.documentElement.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     </script>
     <link rel="stylesheet" href="/src/styles.css" />
     <link rel="preload" as="image" href="./src/assets/CORNER COUCH LOGO CC.png" fetchpriority="high" />
-    <link rel="preload" as="image" href="./src/assets/PHOTO-2026-09-01-11-21-44.jpg" fetchpriority="high" />
   </head>
-  <body>
+  <body class="is-app" data-theme="dark">
     <div class="loader" id="loader" role="status" aria-live="polite" aria-label="Loading Corner Couch">
       <div class="loader__bg"></div>
       <div class="loader__mark">
@@ -49,87 +50,35 @@
     </div>
 
     <header class="nav" id="nav">
-      <button class="nav__menu" id="menuBtn" aria-label="Open menu" aria-expanded="false">
-        <i class="nav__menu-icon" aria-hidden="true">
-          <span></span>
-          <span></span>
-        </i>
-      </button>
-      <a class="nav__logo" href="#top" aria-label="CornerCouch home">
+      <span class="nav__side" aria-hidden="true"></span>
+      <a class="nav__logo" href="#home" aria-label="CornerCouch home">
         <span>Corner</span><span>Couch</span>
       </a>
       <button class="nav__book" data-open-book>Book now</button>
     </header>
 
-    <nav class="overlay" id="menu" aria-hidden="true">
-      <div class="overlay__inner">
-        <p class="kicker">Menu</p>
-        <ul>
-          <li><a href="#top">Home</a></li>
-          <li><a href="#packages">Packages</a></li>
-          <li><a href="#drinks">Food &amp; drinks</a></li>
-          <li><a href="#events">Events</a></li>
-          <li><a href="#book">Visit</a></li>
-        </ul>
-      </div>
-    </nav>
+    <main class="app" id="app">
+      <section class="screen screen--home is-active" id="home" data-screen="home" aria-label="Home">
+        <div class="home__media">
+          <video
+            class="home__video"
+            id="homeVideo"
+            muted
+            loop
+            playsinline
+            webkit-playsinline
+            preload="metadata"
+            aria-hidden="true"
+          ></video>
+        </div>
+        <div class="home__veil"></div>
+        <div class="home__content">
+          <p class="kicker">Open bar club</p>
+          <h1>A corner.<br />A couch.<br />The night.</h1>
+        </div>
+      </section>
 
-    <main id="top">
-      <div class="stack">
-        <section class="hero" aria-label="Hero">
-          <div class="hero__media" data-hero-media>
-            <img
-              src="./src/assets/PHOTO-2026-09-01-11-21-44.jpg"
-              alt="Guest on the couch at CornerCouch, Phakalane"
-              sizes="100vw"
-              decoding="async"
-              fetchpriority="high"
-            />
-          </div>
-          <div class="hero__veil"></div>
-          <div class="hero__content">
-            <p class="kicker">Open bar club</p>
-            <h1>A corner.<br />A couch.<br />The night.</h1>
-          </div>
-          <a class="scroll-hint" href="#night" aria-label="Scroll down">
-            <span>Scroll down</span>
-            <em></em>
-          </a>
-        </section>
-
-        <section class="scene scene--dark" id="night">
-          <div class="scene__media">
-            <img
-              src="./src/assets/PHOTO-2026-09-01-11-21-45 3.jpg"
-              alt="Guest raising a drink under the lights at CornerCouch"
-              sizes="100vw"
-              decoding="async"
-              loading="lazy"
-            />
-          </div>
-          <div class="scene__copy">
-            <p class="kicker">The night</p>
-            <h2>Raise it.<br />Then sit.</h2>
-          </div>
-        </section>
-
-        <section class="scene scene--dark" id="room">
-          <div class="scene__media">
-            <img
-              src="./src/assets/PHOTO-2026-09-01-11-21-46 2.jpg"
-              alt="Resident DJs in the booth at CornerCouch"
-              sizes="100vw"
-              decoding="async"
-              loading="lazy"
-            />
-          </div>
-          <div class="scene__copy">
-            <p class="kicker">The room</p>
-            <h2>The booth<br />is open.</h2>
-          </div>
-        </section>
-      </div>
-
+      <section class="screen screen--events" id="events" data-screen="events" aria-label="Events">
       <section class="packages" id="packages">
         <div class="packages__head">
           <p class="kicker">Packages</p>
@@ -154,7 +103,7 @@
         </div>
       </section>
 
-      <section class="events" id="events">
+      <section class="events">
         <div class="events__head">
           <p class="kicker">Events</p>
           <h2>This week.</h2>
@@ -183,7 +132,9 @@
           </li>
         </ul>
       </section>
+      </section>
 
+      <section class="screen screen--menu" id="menu" data-screen="menu" aria-label="Food and drinks">
       <section class="drinks" id="drinks">
         <div class="drinks__list">
           <article class="drinks__acc">
@@ -518,8 +469,9 @@
           </article>
         </div>
       </section>
-    </main>
+      </section>
 
+      <section class="screen screen--visit" id="visit" data-screen="visit" aria-label="Visit">
     <footer class="foot" id="book">
       <div class="foot__grid">
         <div>
@@ -542,6 +494,48 @@
       </div>
       <p class="foot__legal">CornerCouch · Phakalane, Gaborone</p>
     </footer>
+      </section>
+    </main>
+
+    <nav class="dock-outer" aria-label="App">
+      <div class="dock-panel" id="dock" role="tablist">
+        <button class="dock-item is-active" type="button" role="tab" aria-selected="true" data-screen="home" aria-label="Home">
+          <span class="dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+              <path d="M4 10.8 12 4l8 6.8V20a1 1 0 0 1-1 1h-5.2v-6.2H10.2V21H5a1 1 0 0 1-1-1v-9.2Z" />
+            </svg>
+          </span>
+          <span class="dock-label">Home</span>
+        </button>
+        <button class="dock-item" type="button" role="tab" aria-selected="false" data-screen="menu" aria-label="Menu">
+          <span class="dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+              <path d="M8 4v16M8 8h3a3 3 0 0 0 0-6H8" />
+              <path d="M16 21c2.2-2.2 3-4.5 3-7.2V4h-2.2C14 4 12 6.2 12 8.8S14 14 16.8 14H19" />
+            </svg>
+          </span>
+          <span class="dock-label">Menu</span>
+        </button>
+        <button class="dock-item" type="button" role="tab" aria-selected="false" data-screen="events" aria-label="Events">
+          <span class="dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+              <rect x="3.5" y="5" width="17" height="16" rx="2" />
+              <path d="M8 3v4M16 3v4M3.5 10h17" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="dock-label">Events</span>
+        </button>
+        <button class="dock-item" type="button" role="tab" aria-selected="false" data-screen="visit" aria-label="Visit">
+          <span class="dock-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+              <path d="M12 21s7-6.2 7-11.2A7 7 0 0 0 5 9.8C5 14.8 12 21 12 21Z" />
+              <circle cx="12" cy="9.8" r="2.2" />
+            </svg>
+          </span>
+          <span class="dock-label">Visit</span>
+        </button>
+      </div>
+    </nav>
 
     <aside class="book" id="bookPanel" aria-hidden="true">
       <button class="book__close" id="bookClose" aria-label="Close booking">Close</button>
