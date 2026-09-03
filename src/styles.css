@@ -1,3 +1,51 @@
+@property --page {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0a0a0a;
+}
+
+@property --page-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f6f6f4;
+}
+
+@property --dock-bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #120f17;
+}
+
+@property --dock-item {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #120f17;
+}
+
+@property --dock-border {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #222222;
+}
+
+@property --chrome-fill {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0a0a0a;
+}
+
+@property --chrome-ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f6f6f4;
+}
+
+@property --kicker {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c9a45c;
+}
+
 :root {
   --ink: #0a0a0a;
   --ink-soft: #111111;
@@ -15,6 +63,16 @@
   --nav-h: clamp(4.65rem, 12vw, 5.75rem);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --dock-h: 5.85rem;
+  --theme-shift: 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  --chrome-fill: #0a0a0a;
+  --chrome-ink: #f6f6f4;
+  --dock-bg: #120f17;
+  --dock-border: #222222;
+  --dock-item: #120f17;
+  --page: #0a0a0a;
+  --page-text: #f6f6f4;
+  --kicker: #c9a45c;
 }
 
 *,
@@ -27,24 +85,45 @@ html {
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  background: var(--page);
+  color: var(--page-text);
+  transition: background-color var(--theme-shift), color var(--theme-shift);
+}
+
+html[data-theme="light"] {
+  --chrome-fill: #f6f6f4;
+  --chrome-ink: #0a0a0a;
+  --dock-bg: #efece6;
+  --dock-border: #d8d4cc;
+  --dock-item: #e7e4dc;
+  --page: #f6f6f4;
+  --page-text: #0a0a0a;
+  --kicker: #8f6f2e;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--page);
+  color: var(--page-text);
   font-family: var(--sans);
   font-weight: 500;
   letter-spacing: 0.02em;
+  transition: background-color var(--theme-shift), color var(--theme-shift);
 }
 
 body {
   overflow-x: hidden;
 }
 
-body:not(.is-ready) {
+body:not(.is-ready),
+body.is-app {
   overflow: hidden;
   height: 100svh;
 }
@@ -96,14 +175,11 @@ p {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   margin: 0;
-  color: var(--gold);
+  color: var(--kicker);
 }
 
-.scene--light .kicker,
-.packages .kicker,
-.drinks .kicker,
 .book .kicker {
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .loader {
@@ -534,9 +610,12 @@ body.is-ready .scroll-hint {
   padding-bottom: calc(clamp(3.5rem, 10vh, 8rem) + var(--safe-bottom));
 }
 
-.packages {
-  background: var(--cream);
-  color: var(--ink);
+.packages,
+.drinks,
+.events {
+  background: var(--page);
+  color: var(--page-text);
+  transition: background-color var(--theme-shift), color var(--theme-shift);
 }
 
 .packages__head,
@@ -555,8 +634,8 @@ body.is-ready .scroll-hint {
 .packages__grid {
   display: grid;
   gap: 1px;
-  background: rgba(var(--ink-rgb), 0.12);
-  border: 1px solid rgba(var(--ink-rgb), 0.12);
+  background: color-mix(in srgb, var(--page-text) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--page-text) 12%, transparent);
 }
 
 @media (min-width: 640px) {
@@ -581,13 +660,14 @@ body.is-ready .scroll-hint {
 
 .pack {
   text-align: left;
-  background: var(--cream);
+  background: var(--dock-item);
+  color: var(--page-text);
   padding: clamp(1.4rem, 3vw, 2rem) clamp(1.15rem, 2.5vw, 1.6rem) 1.6rem;
   display: grid;
   gap: 0.9rem;
   align-content: space-between;
   min-height: 200px;
-  transition: background 0.35s ease, color 0.35s ease;
+  transition: background-color var(--theme-shift), color var(--theme-shift);
 }
 
 .pack:focus-visible {
@@ -600,7 +680,7 @@ body.is-ready .scroll-hint {
 }
 
 .pack__tag {
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .pack:focus-visible .pack__tag {
@@ -618,18 +698,14 @@ body.is-ready .scroll-hint {
 }
 
 .events__date {
-  color: var(--gold);
-}
-
-.events {
-  background: var(--ink);
+  color: var(--kicker);
 }
 
 .events__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid rgba(var(--cream-rgb), 0.2);
+  border-top: 1px solid color-mix(in srgb, var(--page-text) 16%, transparent);
 }
 
 .events__list button {
@@ -638,7 +714,7 @@ body.is-ready .scroll-hint {
   grid-template-columns: 1fr;
   gap: 0.35rem;
   padding: 1.5rem 0;
-  border-bottom: 1px solid rgba(var(--cream-rgb), 0.2);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 16%, transparent);
   text-align: left;
 }
 
@@ -681,19 +757,14 @@ body.is-ready .scroll-hint {
   }
 }
 
-.drinks {
-  background: var(--cream);
-  color: var(--ink);
-}
-
 .drinks__list {
   max-width: 72rem;
   margin: 0 auto;
-  border-top: 1px solid rgba(var(--ink-rgb), 0.14);
+  border-top: 1px solid color-mix(in srgb, var(--page-text) 14%, transparent);
 }
 
 .drinks__acc {
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.14);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 14%, transparent);
 }
 
 .drinks__toggle {
@@ -713,7 +784,7 @@ body.is-ready .scroll-hint {
 }
 
 .drinks__toggle:focus-visible {
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .drinks__panel {
@@ -750,7 +821,7 @@ body.is-ready .scroll-hint {
   text-transform: uppercase;
   font-size: 0.66rem;
   font-weight: 500;
-  color: var(--gold-deep);
+  color: var(--kicker);
   text-align: center;
 }
 
@@ -763,7 +834,7 @@ body.is-ready .scroll-hint {
   grid-template-columns: 1fr;
   gap: 0.2rem;
   padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 8%, transparent);
 }
 
 .drink-row:last-child {
@@ -821,8 +892,13 @@ body.is-ready .scroll-hint {
 }
 
 .foot {
-  background: var(--ink-soft);
-  border-top: 1px solid rgba(var(--cream-rgb), 0.12);
+  background: var(--page);
+  color: var(--page-text);
+  border-top: 1px solid color-mix(in srgb, var(--page-text) 12%, transparent);
+  transition:
+    background-color var(--theme-shift),
+    color var(--theme-shift),
+    border-color var(--theme-shift);
 }
 
 .foot__grid {
@@ -868,12 +944,15 @@ body.is-ready .scroll-hint {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: var(--cream);
-  color: var(--ink);
+  background: var(--page);
+  color: var(--page-text);
   overflow: hidden;
   visibility: hidden;
   pointer-events: none;
   clip-path: inset(0 0 0 100%);
+  transition:
+    background-color var(--theme-shift),
+    color var(--theme-shift);
 }
 
 .book.is-open {
@@ -954,7 +1033,7 @@ body.is-ready .scroll-hint {
   width: 100%;
   text-align: left;
   border: 0;
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.35);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 35%, transparent);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -979,8 +1058,8 @@ body.is-ready .scroll-hint {
 }
 
 .book-drop.is-open .book-drop__trigger {
-  border-bottom-color: var(--gold-deep);
-  color: var(--gold-deep);
+  border-bottom-color: var(--kicker);
+  color: var(--kicker);
 }
 
 .book-drop.is-open .book-drop__trigger::after {
@@ -1029,7 +1108,7 @@ body.is-ready .scroll-hint {
   width: 100%;
   text-align: left;
   padding: 0.7rem 0;
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 8%, transparent);
   color: inherit;
   font: inherit;
   font-size: 1rem;
@@ -1040,7 +1119,7 @@ body.is-ready .scroll-hint {
 }
 
 .book-drop__options button.is-selected {
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .datepicker__nav {
@@ -1061,7 +1140,7 @@ body.is-ready .scroll-hint {
 .datepicker__nav button {
   width: 2.25rem;
   height: 2.25rem;
-  color: var(--ink);
+  color: var(--page-text);
   font-size: 1.2rem;
   line-height: 1;
   opacity: 0.55;
@@ -1078,7 +1157,7 @@ body.is-ready .scroll-hint {
 
 .datepicker__week {
   margin-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 12%, transparent);
   padding-bottom: 0.35rem;
 }
 
@@ -1087,13 +1166,13 @@ body.is-ready .scroll-hint {
   font-size: 0.62rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .datepicker__grid button {
   aspect-ratio: 1;
   font-size: 0.82rem;
-  color: var(--ink);
+  color: var(--page-text);
   background: transparent;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -1120,7 +1199,7 @@ body.is-ready .scroll-hint {
   appearance: none;
   width: 100%;
   border: 0;
-  border-bottom: 1px solid rgba(var(--ink-rgb), 0.35);
+  border-bottom: 1px solid color-mix(in srgb, var(--page-text) 35%, transparent);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -1137,13 +1216,17 @@ body.is-ready .scroll-hint {
   overflow: hidden;
   isolation: isolate;
   margin-top: 0.6rem;
-  background: var(--ink);
-  color: var(--cream);
+  background: var(--page-text);
+  color: var(--page);
   padding: 1rem 1.2rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   min-height: 3.15rem;
-  transition: transform 0.25s ease, opacity 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    background-color var(--theme-shift),
+    color var(--theme-shift);
 }
 
 .book__pay:disabled {
@@ -1196,13 +1279,13 @@ body.is-ready .scroll-hint {
 
 .seat-map-wrap {
   overflow: hidden;
-  border: 1px solid rgba(var(--ink-rgb), 0.12);
+  border: 1px solid color-mix(in srgb, var(--page-text) 12%, transparent);
 }
 
 .floorplan {
   position: relative;
   width: 100%;
-  color: var(--ink);
+  color: var(--page-text);
 }
 
 .floorplan__svg {
@@ -1215,19 +1298,19 @@ body.is-ready .scroll-hint {
 
 .floorplan__room {
   fill: none;
-  stroke: rgba(var(--ink-rgb), 0.22);
+  stroke: color-mix(in srgb, var(--page-text) 22%, transparent);
   stroke-width: 1.2;
 }
 
 .floorplan__marks {
   fill: none;
-  stroke: rgba(var(--ink-rgb), 0.28);
+  stroke: color-mix(in srgb, var(--page-text) 28%, transparent);
   stroke-width: 1.2;
 }
 
 .floorplan__zones rect {
-  fill: rgba(var(--ink-rgb), 0.04);
-  stroke: rgba(var(--ink-rgb), 0.38);
+  fill: color-mix(in srgb, var(--page-text) 4%, transparent);
+  stroke: color-mix(in srgb, var(--page-text) 38%, transparent);
   stroke-width: 1.2;
 }
 
@@ -1241,7 +1324,7 @@ body.is-ready .scroll-hint {
 }
 
 .floorplan__labels .floorplan__quiet {
-  fill: rgba(var(--ink-rgb), 0.42);
+  fill: color-mix(in srgb, var(--page-text) 42%, transparent);
 }
 
 .seat {
@@ -1298,7 +1381,7 @@ body.is-ready .scroll-hint {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 0.68rem;
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .book__pay {
@@ -1316,7 +1399,7 @@ body.is-ready .scroll-hint {
 
 .book__back:focus-visible {
   opacity: 1;
-  color: var(--gold-deep);
+  color: var(--kicker);
 }
 
 .is-locked {
@@ -1368,7 +1451,7 @@ body.is-ready .scroll-hint {
 
   .datepicker__nav button:hover {
     opacity: 1;
-    color: var(--gold-deep);
+    color: var(--kicker);
   }
 
   .datepicker__grid button:hover:not(:disabled):not(.is-selected) {
@@ -1376,7 +1459,7 @@ body.is-ready .scroll-hint {
   }
 
   .book-drop__options button:hover {
-    color: var(--gold-deep);
+    color: var(--kicker);
   }
 
   .book form > button:hover,
@@ -1393,7 +1476,7 @@ body.is-ready .scroll-hint {
 
   .book__back:hover {
     opacity: 1;
-    color: var(--gold-deep);
+    color: var(--kicker);
   }
 
   .seat:hover {
@@ -1401,7 +1484,7 @@ body.is-ready .scroll-hint {
   }
 
   .drinks__toggle:hover {
-    color: var(--gold-deep);
+    color: var(--kicker);
   }
 }
 
@@ -1503,6 +1586,8 @@ body.is-ready .scroll-hint {
 
   .nav,
   .hero__content,
+  .home__content,
+  .dock-outer,
   .scroll-hint {
     opacity: 1;
   }
@@ -1518,5 +1603,290 @@ body.is-ready .scroll-hint {
 
   .drinks__panel {
     transition: none;
+  }
+
+  :root {
+    --theme-shift: 0.01s;
+  }
+}
+
+/* App shell: one screen at a time + ReactBits-style dock */
+.nav__side {
+  justify-self: start;
+  width: 44px;
+  height: 44px;
+}
+
+.app {
+  position: relative;
+  height: 100svh;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  visibility: hidden;
+  pointer-events: none;
+  padding-bottom: calc(var(--dock-h) + var(--safe-bottom));
+}
+
+.screen.is-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.screen--home {
+  overflow: hidden;
+  padding: 0;
+  background: var(--page);
+  transition: background-color var(--theme-shift);
+}
+
+.screen--menu,
+.screen--events {
+  background: var(--page);
+  transition: background-color var(--theme-shift);
+}
+
+.screen--visit {
+  background: var(--page);
+  transition: background-color var(--theme-shift);
+}
+
+.home__media,
+.home__video,
+.home__veil {
+  position: absolute;
+  inset: 0;
+}
+
+.home__media {
+  overflow: hidden;
+  background: var(--page);
+  transition: background-color var(--theme-shift);
+}
+
+.home__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+}
+
+.home__video.is-on {
+  z-index: 2;
+  opacity: 1;
+}
+
+.home__veil {
+  z-index: 3;
+  background: linear-gradient(
+    180deg,
+    transparent 42%,
+    color-mix(in srgb, var(--page) 55%, transparent) 100%
+  );
+}
+
+.home__content {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: calc(var(--dock-h) + var(--safe-bottom) + 0.4rem);
+  z-index: 4;
+  width: min(100%, 40rem);
+  display: grid;
+  gap: clamp(0.7rem, 2vh, 1.15rem);
+  opacity: 0;
+  color: var(--page-text);
+  transition: color var(--theme-shift);
+}
+
+.home__content h1 {
+  font-size: clamp(2.35rem, 10vw, 6.4rem);
+  max-width: 11ch;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+body.is-app .nav {
+  color: var(--chrome-ink);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--chrome-fill) 88%, transparent) 0%,
+    color-mix(in srgb, var(--chrome-fill) 0%, transparent) 100%
+  );
+  transition: color var(--theme-shift);
+}
+
+.screen--menu,
+.screen--events,
+.screen--visit {
+  padding-top: calc(var(--nav-h) + var(--safe-top));
+}
+
+.screen--menu .drinks,
+.screen--events .packages,
+.screen--events .events,
+.screen--visit .foot {
+  padding-top: clamp(1.25rem, 4vh, 2.5rem);
+  padding-bottom: 2rem;
+}
+
+.screen--visit .foot {
+  min-height: calc(100svh - var(--nav-h) - var(--dock-h) - var(--safe-top) - var(--safe-bottom));
+}
+
+.dock-outer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0 0.5rem calc(0.5rem + var(--safe-bottom));
+  pointer-events: none;
+  opacity: 0;
+  overflow: visible;
+}
+
+body.is-locked .dock-outer {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.dock-panel {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  width: fit-content;
+  max-width: calc(100% - 1rem);
+  gap: 1rem;
+  border-radius: 1rem;
+  background-color: var(--dock-bg);
+  border: 1px solid var(--dock-border);
+  padding: 0.45rem 0.5rem 0.5rem;
+  color: var(--chrome-ink);
+  transition:
+    background-color var(--theme-shift),
+    border-color var(--theme-shift),
+    color var(--theme-shift);
+}
+
+.dock-item {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: var(--dock-item);
+  border: 1px solid var(--dock-border);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  flex: 0 0 auto;
+  transform-origin: center bottom;
+  transition:
+    background-color var(--theme-shift),
+    border-color var(--theme-shift),
+    color var(--theme-shift);
+}
+
+.dock-item.is-active {
+  border-color: rgba(var(--gold-rgb), 0.7);
+  color: var(--gold);
+}
+
+.dock-item:focus-visible {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.dock-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dock-label {
+  position: absolute;
+  top: -1.5rem;
+  left: 50%;
+  width: fit-content;
+  white-space: pre;
+  border-radius: 0.375rem;
+  border: 1px solid var(--dock-border);
+  background-color: var(--dock-bg);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--chrome-ink);
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background-color var(--theme-shift),
+    border-color var(--theme-shift),
+    color var(--theme-shift);
+}
+
+.dock-item.is-label-on .dock-label {
+  opacity: 1;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .dock-panel {
+    gap: 0.35rem;
+    width: min(28rem, calc(100% - 1rem));
+    justify-content: space-around;
+    padding: 0.35rem 0.4rem 0.4rem;
+  }
+
+  .dock-item {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    min-height: 3.15rem;
+    gap: 0.2rem;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0.2rem 0.15rem;
+  }
+
+  .dock-item.is-active {
+    background: rgba(var(--gold-rgb), 0.12);
+  }
+
+  .dock-label {
+    position: static;
+    transform: none;
+    opacity: 1;
+    border: 0;
+    background: none;
+    padding: 0;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: inherit;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 479px) {
+  .home__content h1 {
+    font-size: clamp(2.05rem, 11vw, 3.2rem);
   }
 }
