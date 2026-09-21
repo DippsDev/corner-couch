@@ -1,4 +1,8 @@
 import gsap from "gsap";
+import { createChampagneViewer } from "./champagne.js";
+import homeDj from "./assets/PHOTO-2026-09-01-11-21-46 2.jpg";
+import homeCouch from "./assets/PHOTO-2026-09-01-11-21-45 3.jpg";
+import homeSmile from "./assets/PHOTO-2026-09-01-11-21-44.jpg";
 
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 window.scrollTo(0, 0);
@@ -19,13 +23,48 @@ const screens = [...document.querySelectorAll(".screen")];
 const dockItems = [...document.querySelectorAll(".dock-item")];
 const dockPanel = document.querySelector("#dock");
 const homeVideo = document.querySelector("#homeVideo");
+const homePhotos = document.querySelector("#homePhotos");
+const seatLead = document.querySelector("#seatLead");
+const ticketCode = document.querySelector("#ticketCode");
+const ticketRows = document.querySelector("#ticketRows");
+const ticketNote = document.querySelector("#ticketNote");
+const bottlePriceLine = document.querySelector("#bottlePrice");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-const packNames = {
-  "open-bar": "Open bar",
-  "vip-couch": "The couch",
-  birthday: "The party",
+const COUCH_HOLD = 1500;
+const bottleNames = {
+  couch: "Just the Couch",
+  hennessy: "Hennessy",
+  "glenfiddich-12": "Glenfiddich 12+",
+  "billiato-plus": "Billiato + another bottle",
+  "hennessy-vsop": "Hennessy VSOP",
+  "remy-vs": "Rémy Martin VS",
+  "remy-vsop": "Rémy Martin VSOP",
 };
+const bottlePrices = {
+  couch: 1500,
+  hennessy: 1500,
+  "glenfiddich-12": 1800,
+  "billiato-plus": 1500,
+  "hennessy-vsop": 2200,
+  "remy-vs": 1600,
+  "remy-vsop": 2400,
+};
+const seatCodes = {
+  VIP: "VIP",
+  "Section A": "A",
+  "Section B": "B",
+  "Section C": "C",
+  Outside: "OUT",
+};
+const nightSeats = {
+  "2026-09-24": { VIP: "held", "Section C": "taken" },
+  "2026-09-25": { "Section A": "taken", Outside: "held" },
+  "2026-09-26": { VIP: "taken", "Section B": "taken" },
+  "2026-09-27": { Outside: "taken", "Section B": "held" },
+  "2026-10-02": { "Section C": "held", Outside: "taken" },
+};
+const homeShots = [homeDj, homeCouch, homeSmile];
 
 let pendingBooking = null;
 let selectedSeat = "";
@@ -33,6 +72,11 @@ let currentScreen = "home";
 let bookOpen = false;
 let bookTween;
 let dockTween;
+let homePhotoTimer = 0;
+let nightOccupancy = {};
+const champagne = createChampagneViewer(document.querySelector("#orderChampagne"), {
+  reduceMotion,
+});
 
 function lock(on) {
   document.body.classList.toggle("is-locked", on);
@@ -151,7 +195,44 @@ const homeClips = import.meta.glob("./assets/home.{mp4,webm}", {
 });
 const homeClip = Object.values(homeClips)[0];
 
+function initHomePhotos() {
+  if (!homePhotos || homePhotos.childElementCount) return;
+
+  homeShots.forEach((src, index) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "";
+    img.decoding = index === 0 ? "sync" : "async";
+    if (index === 0) {
+      img.fetchPriority = "high";
+      img.classList.add("is-on");
+    }
+    homePhotos.append(img);
+  });
+}
+
+function stopHomePhotos() {
+  window.clearInterval(homePhotoTimer);
+  homePhotoTimer = 0;
+}
+
+function playHomePhotos() {
+  initHomePhotos();
+  if (!homePhotos || reduceMotion) return;
+
+  const frames = [...homePhotos.querySelectorAll("img")];
+  if (frames.length < 2) return;
+
+  stopHomePhotos();
+  homePhotoTimer = window.setInterval(() => {
+    const on = frames.findIndex((img) => img.classList.contains("is-on"));
+    frames[on]?.classList.remove("is-on");
+    frames[(on + 1) % frames.length]?.classList.add("is-on");
+  }, 4000);
+}
+
 function playHomeMedia() {
+  playHomePhotos();
   if (!homeVideo || !homeClip || reduceMotion) return;
   homeVideo.src = homeClip;
   homeVideo.muted = true;
@@ -166,9 +247,12 @@ function playHomeMedia() {
 }
 
 function pauseHomeMedia() {
+  stopHomePhotos();
   if (!homeVideo?.classList.contains("is-on")) return;
   homeVideo.pause();
 }
+
+initHomePhotos();
 
 const themeColor = document.querySelector('meta[name="theme-color"]');
 const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
@@ -192,16 +276,37 @@ function syncDock(next) {
   });
 }
 
+function setNavLine(scrollTop = 0) {
+  if (!nav) return;
+  const range = 96;
+  const faded = 0.28;
+  const t = Math.min(1, Math.max(0, scrollTop / range));
+  nav.style.setProperty("--nav-line", String(1 - t * (1 - faded)));
+}
+
 function activateScreen(next) {
   screens.forEach((screen) => {
     const on = screen.dataset.screen === next;
     screen.classList.toggle("is-active", on);
     if (on) screen.scrollTop = 0;
   });
+  setNavLine(0);
   syncDock(next);
+  champagne.setActive(next === "order");
   if (next === "home") playHomeMedia();
   else pauseHomeMedia();
 }
+
+screens.forEach((screen) => {
+  screen.addEventListener(
+    "scroll",
+    () => {
+      if (!screen.classList.contains("is-active")) return;
+      setNavLine(screen.scrollTop);
+    },
+    { passive: true },
+  );
+});
 
 function showScreen(id, { hash = true } = {}) {
   const next = screens.find((screen) => screen.dataset.screen === id) ? id : "home";
@@ -354,6 +459,14 @@ const datepicker = document.querySelector(".datepicker");
 const dateInput = bookForm.querySelector("input[name=date]");
 const dateTrigger = document.querySelector("#dateTrigger");
 const dateLabel = dateTrigger?.querySelector("[data-date-label]");
+const eventLabel = dateTrigger?.querySelector("[data-event-label]");
+const eventInput = bookForm?.querySelector("input[name=event]");
+const eventByDate = Object.fromEntries(
+  [...document.querySelectorAll(".events__list [data-open-book][data-date]")].flatMap((btn) => {
+    const name = btn.querySelector(".events__name")?.textContent.trim();
+    return name ? [[btn.dataset.date, name]] : [];
+  }),
+);
 const datePop = document.querySelector("#datePop");
 const dateGrid = datePop?.querySelector("[data-cal-grid]");
 const dateMonth = datePop?.querySelector("[data-cal-month]");
@@ -388,6 +501,10 @@ function formatDisplay(iso) {
   return `${d} / ${m} / ${y}`;
 }
 
+function eventNameFor(iso) {
+  return eventByDate[iso] || "";
+}
+
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
@@ -396,6 +513,9 @@ function setPickedDate(iso) {
   if (!iso || !dateInput) return;
   dateInput.value = iso;
   if (dateLabel) dateLabel.textContent = formatDisplay(iso);
+  const eventName = eventNameFor(iso);
+  if (eventInput) eventInput.value = eventName;
+  if (eventLabel) eventLabel.textContent = eventName;
   dateTrigger?.classList.add("is-filled");
   renderCalendar();
 }
@@ -430,13 +550,14 @@ function setDropValue(name, value) {
   if (!option) return;
   input.value = value;
   const label = drop.querySelector("[data-drop-label]");
-  if (label) label.textContent = option.textContent.trim();
+  if (label) label.textContent = optionLabel(option);
   drop.querySelector(".book-drop__trigger")?.classList.add("is-filled");
   drop.querySelectorAll("[data-drop-option]").forEach((btn) => {
     const on = btn === option;
     btn.classList.toggle("is-selected", on);
     btn.setAttribute("aria-selected", on ? "true" : "false");
   });
+  if (name === "bottle" || name === "guests") syncBottlePolicy();
 }
 
 function closeDatepicker() {
@@ -520,6 +641,8 @@ bookDrops.forEach((drop) => {
   });
 });
 
+syncBottlePolicy();
+
 datePop?.querySelector("[data-cal-prev]")?.addEventListener("click", () => {
   calCursor.setMonth(calCursor.getMonth() - 1);
   renderCalendar();
@@ -542,12 +665,145 @@ document.addEventListener("pointerdown", (event) => {
 function resetSeatStep() {
   selectedSeat = "";
   pendingBooking = null;
+  nightOccupancy = {};
   seatButtons.forEach((btn) => {
-    btn.classList.remove("is-on");
+    btn.classList.remove("is-on", "is-taken", "is-held");
     btn.setAttribute("aria-checked", "false");
+    btn.removeAttribute("aria-disabled");
+    btn.disabled = false;
+  });
+  document.querySelectorAll(".floorplan__zones rect").forEach((rect) => {
+    rect.classList.remove("is-taken", "is-held");
   });
   if (seatChoice) seatChoice.textContent = "No section selected";
-  if (paySeat) paySeat.disabled = true;
+  if (paySeat) {
+    paySeat.disabled = true;
+    paySeat.textContent = "Hold table";
+  }
+}
+
+function seatStatus(name) {
+  return nightOccupancy[name] || "";
+}
+
+function formatPula(n) {
+  return `${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}P`;
+}
+
+function optionLabel(option) {
+  return option.dataset.dropName || option.textContent.replace(/\s+/g, " ").trim();
+}
+
+function formPolicyKey() {
+  return bookForm?.elements.bottle?.value || "couch";
+}
+
+function policyKey(data) {
+  if (!data) return formPolicyKey();
+  return data.bottle || "couch";
+}
+
+function holdFee(data) {
+  return bottlePrices[policyKey(data)] || COUCH_HOLD;
+}
+
+function updatePolicyLine() {
+  const key = formPolicyKey();
+  const name = bottleNames[key] || "Table";
+  const price = bottlePrices[key] || COUCH_HOLD;
+  if (bottlePriceLine) bottlePriceLine.textContent = `${name} · ${formatPula(price)}`;
+}
+
+function syncBottlePolicy() {
+  updatePolicyLine();
+}
+
+function occupancyFor(date) {
+  return { ...(nightSeats[date] || { "Section A": "taken" }) };
+}
+
+function occupancyLine() {
+  const taken = Object.entries(nightOccupancy)
+    .filter(([, status]) => status === "taken")
+    .map(([name]) => name);
+  const held = Object.entries(nightOccupancy)
+    .filter(([, status]) => status === "held")
+    .map(([name]) => name);
+  const bits = [];
+  if (taken.length) bits.push(`${taken.join(" and ")} taken`);
+  if (held.length) bits.push(`${held.join(" and ")} held`);
+  const policy = "1 500P for the couch, or a bottle of that value";
+  if (!bits.length) {
+    return `${policy}. Choose your section.`;
+  }
+  return `${bits.join(". ")}. ${policy}.`;
+}
+
+function applyOccupancy(date) {
+  nightOccupancy = occupancyFor(date);
+  const zones = document.querySelectorAll(".floorplan__zones rect");
+
+  seatButtons.forEach((btn) => {
+    const status = seatStatus(btn.dataset.seat);
+    btn.classList.remove("is-on", "is-taken", "is-held");
+    btn.setAttribute("aria-checked", "false");
+    btn.classList.toggle("is-taken", status === "taken");
+    btn.classList.toggle("is-held", status === "held");
+    btn.disabled = Boolean(status);
+    if (status) btn.setAttribute("aria-disabled", "true");
+    else btn.removeAttribute("aria-disabled");
+    const label = btn.dataset.seat || "Section";
+    btn.setAttribute("aria-label", status ? `${label}, ${status}` : label);
+  });
+
+  zones.forEach((rect) => {
+    const status = seatStatus(rect.getAttribute("data-zone"));
+    rect.classList.toggle("is-taken", status === "taken");
+    rect.classList.toggle("is-held", status === "held");
+  });
+
+  selectedSeat = "";
+  if (seatChoice) seatChoice.textContent = "No section selected";
+  if (seatLead) seatLead.textContent = occupancyLine();
+  if (paySeat) {
+    paySeat.disabled = true;
+    paySeat.textContent = `Hold table · ${formatPula(holdFee())}`;
+  }
+}
+
+function ticketPass(data) {
+  const [year, month, day] = String(data.date || "").split("-");
+  const code = `CC-${day || "00"}${month || "00"}-${seatCodes[data.seat] || "TBL"}`;
+  const rows = [
+    ["Guest", data.name],
+    ["Event", data.event],
+    ["Table", bottleNames[policyKey(data)] || data.bottle],
+    ["When", `${formatDisplay(data.date)} · ${data.time}`],
+    ["Section", data.seat],
+    ["Guests", data.guests],
+    ["Entry", data.bottle === "couch" ? "Just the Couch" : "2 guests per bottle"],
+    ["Hold", formatPula(data.fee)],
+  ].filter(([, value]) => value);
+
+  if (ticketCode) ticketCode.textContent = code;
+  if (ticketRows) {
+    ticketRows.replaceChildren(
+      ...rows.map(([label, value]) => {
+        const row = document.createElement("div");
+        row.className = "ticket__row";
+        const dt = document.createElement("span");
+        dt.textContent = label;
+        const dd = document.createElement("b");
+        dd.textContent = value;
+        row.append(dt, dd);
+        return row;
+      }),
+    );
+  }
+  if (ticketNote) {
+    ticketNote.textContent = `Show this pass at the door. Same copy lands on ${data.contact}.`;
+  }
+  return code;
 }
 
 function showBookStep(step) {
@@ -565,15 +821,23 @@ function showBookStep(step) {
   if (bookTitle) {
     bookTitle.textContent = isSeat ? "Choose your seat." : "Book your couch";
   }
+  if (isSeat && pendingBooking?.date) applyOccupancy(pendingBooking.date);
+  if (isDone && !reduceMotion) {
+    gsap.fromTo(
+      ".ticket",
+      { y: 18, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" },
+    );
+  }
   const scroll = bookPanel.querySelector(".book__scroll");
   if (scroll) scroll.scrollTop = 0;
 }
 
-function openBook({ date, pack } = {}, trigger) {
+function openBook({ date } = {}, trigger) {
   resetSeatStep();
   showBookStep("form");
+  setDropValue("bottle", "couch");
   if (date) setPickedDate(date);
-  if (pack) setDropValue("pack", pack);
 
   if (trigger?.classList.contains("nav__book") && !reduceMotion) {
     gsap.fromTo(
@@ -680,13 +944,7 @@ function closeBook({ immediate = false } = {}) {
 
 document.querySelectorAll("[data-open-book]").forEach((el) => {
   el.addEventListener("click", () => {
-    openBook(
-      {
-        date: el.dataset.date,
-        pack: el.dataset.pack,
-      },
-      el,
-    );
+    openBook({ date: el.dataset.date }, el);
   });
 });
 
@@ -717,6 +975,7 @@ bookForm.addEventListener("submit", (event) => {
 
 seatButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
+    if (btn.disabled || seatStatus(btn.dataset.seat)) return;
     selectedSeat = btn.dataset.seat || "";
     seatButtons.forEach((other) => {
       const on = other === btn;
@@ -724,18 +983,29 @@ seatButtons.forEach((btn) => {
       other.setAttribute("aria-checked", on ? "true" : "false");
     });
     if (seatChoice) seatChoice.textContent = `${selectedSeat} selected`;
-    if (paySeat) paySeat.disabled = false;
+    if (paySeat) {
+      paySeat.disabled = false;
+      paySeat.textContent = `Hold table · ${formatPula(holdFee())}`;
+    }
   });
 });
 
 paySeat?.addEventListener("click", () => {
-  if (!pendingBooking || !selectedSeat) return;
-  const data = { ...pendingBooking, seat: selectedSeat, fee: 1500 };
-  const bookings = JSON.parse(localStorage.getItem("cornercouch-bookings") || "[]");
-  bookings.push({ ...data, createdAt: new Date().toISOString() });
-  localStorage.setItem("cornercouch-bookings", JSON.stringify(bookings));
+  if (!pendingBooking || !selectedSeat || seatStatus(selectedSeat)) return;
+  const data = { ...pendingBooking, seat: selectedSeat, fee: holdFee() };
+  const code = ticketPass(data);
+  try {
+    const bookings = JSON.parse(localStorage.getItem("cornercouch-bookings") || "[]");
+    bookings.push({ ...data, code, createdAt: new Date().toISOString() });
+    localStorage.setItem("cornercouch-bookings", JSON.stringify(bookings));
+  } catch {
+    /* Prototype hold still shows if storage is blocked. */
+  }
 
-  bookSummary.textContent = `${data.name}, ${packNames[data.pack] || data.pack} for ${data.guests} on ${data.date} at ${data.time}. ${data.seat} held for 1500P. We’ll message ${data.contact}.`;
+  if (bookSummary) {
+    const night = data.event ? `${data.event} · ` : "";
+    bookSummary.textContent = `${data.name}, ${night}${bottleNames[policyKey(data)] || data.bottle} · ${formatPula(data.fee)} for ${data.guests} on ${data.date} at ${data.time}. ${data.seat} held. Pass ${code} sent to ${data.contact}.`;
+  }
   showBookStep("done");
 });
 

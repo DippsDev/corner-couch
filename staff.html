@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>CornerCouch - Staff</title>
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/staff.css" />
+  </head>
+  <body class="desk is-gated">
+    <section class="gate" id="staffGate" aria-label="Staff sign in">
+      <form class="gate__form" id="staffLogin" autocomplete="off">
+        <p class="kicker">Staff only</p>
+        <h1>Sign in.</h1>
+        <p class="gate__lead">CornerCouch desk. Door and reservations.</p>
+        <label>
+          <span>Staff name</span>
+          <input name="staff" type="text" required autocomplete="username" placeholder="Door, Host, or Manager" />
+        </label>
+        <label>
+          <span>PIN</span>
+          <input name="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" required autocomplete="current-password" placeholder="••••" />
+        </label>
+        <p class="gate__error" id="staffLoginError" hidden>Wrong name or PIN.</p>
+        <button type="submit">Enter the desk</button>
+      </form>
+    </section>
+
+    <div id="deskApp" hidden>
+      <header class="desk-top">
+        <div class="desk-brand">
+          <a class="desk-logo" href="#book">CornerCouch</a>
+          <p class="kicker">Staff</p>
+        </div>
+        <div class="desk-session">
+          <p id="deskWho">Door</p>
+          <button class="desk-out" type="button" id="deskOut" aria-label="Sign out" title="Sign out">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 4.5H7A2.5 2.5 0 0 0 4.5 7v10A2.5 2.5 0 0 0 7 19.5h3" />
+              <path d="M14 8.5 18.5 12 14 15.5" />
+              <path d="M18.5 12H9.5" />
+            </svg>
+          </button>
+        </div>
+        <nav class="desk-pages" aria-label="Desk pages">
+          <a href="#book" data-page="book">Bookings</a>
+          <a href="#walk-in" data-page="walk">Walk-in</a>
+        </nav>
+        <nav class="desk-nights" id="deskNights" aria-label="Nights"></nav>
+      </header>
+
+      <div class="desk-sub">
+        <div class="desk-night">
+          <p class="kicker" id="deskNightWhen">Thu 24.09</p>
+          <h1 id="deskNightName">Strictly Corner</h1>
+        </div>
+        <div class="desk-stats" id="deskStats"></div>
+      </div>
+
+      <main class="desk-main">
+        <section class="desk-book" id="pageBook" aria-label="Tonight’s book">
+          <div class="desk-toolbar">
+            <label class="desk-search">
+              <span class="visually-hidden">Search</span>
+              <input id="deskSearch" type="search" placeholder="Name, WhatsApp, or pass" autocomplete="off" />
+            </label>
+            <div class="desk-filters" id="deskFilters">
+              <button type="button" class="is-on" data-status="">All</button>
+              <button type="button" data-status="held">Held</button>
+              <button type="button" data-status="arrived">In</button>
+              <button type="button" data-status="noshow">No-show</button>
+            </div>
+          </div>
+
+          <div class="desk-list" id="deskList"></div>
+        </section>
+
+        <section class="desk-walk-page" id="pageWalk" aria-label="Walk-in" hidden>
+          <form class="desk-walk" id="deskWalk" autocomplete="off">
+            <p class="kicker" id="walkKicker">Thu 24.09</p>
+            <h2>Walk-in</h2>
+            <p class="desk-walk__lead">Hold a couch for someone at the door. Just the Couch · 1500P.</p>
+            <p class="desk-walk__done" id="deskWalkDone" hidden></p>
+            <div class="desk-walk__grid">
+              <label>
+                <span>Name</span>
+                <input name="name" type="text" required placeholder="Full name" />
+              </label>
+              <label>
+                <span>WhatsApp</span>
+                <input name="contact" type="tel" required placeholder="+267 71 000 0000" />
+              </label>
+              <label>
+                <span>Section</span>
+                <select name="seat" required>
+                  <option value="Section A">Section A</option>
+                  <option value="Section B">Section B</option>
+                  <option value="Section C">Section C</option>
+                  <option value="VIP">VIP</option>
+                  <option value="Outside">Outside</option>
+                </select>
+              </label>
+              <label>
+                <span>Guests</span>
+                <select name="guests">
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="6" selected>6</option>
+                  <option value="8">8</option>
+                  <option value="10">10</option>
+                </select>
+              </label>
+              <button type="submit">Hold</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/staff.js"></script>
+  </body>
+</html>

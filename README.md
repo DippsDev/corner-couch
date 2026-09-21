@@ -33,6 +33,9 @@ This is a static Vite app. On Vercel, import the repo and use:
 - **Build command:** `npm run build`
 - **Output directory:** `dist`
 
+Guest site: `/`  
+Staff desk: `/staff` (Door or Host PIN `2409`, Manager PIN `1500`)
+
 ## Project layout
 
 | Path | Role |
